@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Todo App</title>
+  <style>
+    /* The CSS styles for the todo app */
+    body {
+      background-color: #333;
+      color: #fff;
+    }
+
+  </style>
+</head>
+<body>
+  <div id="todo-app">
+    <h1 id="infos">Todo List</h1>
+  <!-- The footer -->
+  <footer>
+    This app is built by Saif with the help of ChatGPT
+  </footer>
+  </div>
+
+
+  <script>
+    // Define an array to store the todo items
+    const todos = [];
+
+    // Define a reference to the add todo form and the todo list
+    const head = document.querySelector('#infos');
+
+    // Attach an event listener that listens for the 'load' event
+    window.addEventListener('load', event => {
+      localStorage.setItem('todos', JSON.stringify([]));
+      head.innerHTML="Rest OK"
+    });    
+</script>
+</body>
+</html>

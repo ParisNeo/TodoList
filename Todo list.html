@@ -1,0 +1,418 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Todo App</title>
+  <style>
+    /* The CSS styles for the todo app */
+    body {
+      background-color: #333;
+      color: #fff;
+    }
+    button {
+      background-color: #222;
+      border-style: none;
+      color: #fff;
+      padding: 5px 10px;
+      border-radius: 5px;
+    }
+
+    button:hover {
+      background-color: #555;
+    }
+    #todo-app {
+      display: flex;
+      flex-direction: column;
+      height: 100%;
+      margin: 0 auto;
+      max-width: 600px;
+      padding: 20px;
+    }
+
+    #todo-app > footer {
+      align-self: center;
+      margin-top: auto;
+      text-align: center;
+    }
+    #add-todo-form {
+      display: flex;
+    }
+
+    #add-todo-input {
+      flex: 1;
+      height: 30px;
+      padding: 5px;
+    }
+
+    #todo-list {
+      margin: 20px 0;
+      padding: 0;
+    }
+
+    #todo-list li {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px;
+      height: 50px;
+    }
+
+    #todo-list button {
+      background-color: #222;
+      border-style: none;
+      border-radius: 5px;
+      border: none;
+      color: #fff;
+      cursor: pointer;
+      padding: 5px 10px;
+      height: 50px; /* The height of the list items */
+    }
+    #todo-list button:hover {
+      background-color: #333;
+    }
+    input[type="text"] {
+      background-color: #222;
+      border-style: none;
+      color: #fff;
+      padding: 5px 10px;
+      border-top-left-radius: 5px;
+      border-bottom-left-radius: 5px;
+    }
+    input[type="submit"] {
+      background-color: #222;
+      border-top-right-radius: 5px;
+      border-bottom-right-radius: 5px;
+      border-top-left-radius: 0px;
+      border-bottom-left-radius: 0px;
+      border-style: none;
+      border: none;
+      color: #fff;
+      cursor: pointer;
+      padding: 5px 10px;
+    }
+
+    input[type="submit"]:hover {
+      background-color: #333;
+    }
+    #todo-list input[type="checkbox"] {
+      margin-right: 10px;
+    }
+    .mark-as-done-button {
+      margin-left: auto;
+      border-top-left-radius: 5px;
+      border-bottom-left-radius: 5px;
+      border-top-right-radius: 0px;
+      border-bottom-right-radius: 0px;      
+    }
+    .mark-as-done-button {
+      margin-left: auto;
+      border-top-right-radius: 5px;
+      border-bottom-right-radius: 5px;
+      border-top-right-radius: 0px;
+      border-bottom-right-radius: 0px;      
+    }
+  </style>
+</head>
+<body>
+  <div id="todo-app">
+    <h1>Todo List</h1>
+
+    <!-- A form to add new todo items -->
+    <form id="add-todo-form">
+      <input type="text" id="add-todo-input" placeholder="Enter a new todo item" />
+      <button type="submit">Add Todo</button>
+    </form>
+    <div style="display: flex;">
+      <!-- Export and import buttons -->
+      <button onclick="exportTodos()">Export</button>
+      Import<input type="file" id="import-todos" class="import-button" accept=".json"  onchange="loadTodos()" />
+    </div>        
+    <button id="clear-todo-list">Clear Todo List</button>
+    <!-- A list to display the todo items -->
+    <ul id="todo-list">
+    </ul>
+  <!-- The footer -->
+  <footer>
+    This app is built by Saif with the help of ChatGPT
+  </footer>
+  </div>
+
+
+  <script>
+    // Define an array to store the todo items
+    const todos = [];
+
+    // Define a reference to the add todo form and the todo list
+    const addTodoForm = document.querySelector('#add-todo-form');
+    const todoList = document.querySelector('#todo-list');
+    // Define a reference to the clear todo list button
+    const clearTodoListButton = document.querySelector('#clear-todo-list');
+
+    // Attach an event listener that listens for the 'click' event
+    clearTodoListButton.addEventListener('click', event => {
+      // Clear the todo list
+      todos.splice(0, todos.length);
+      localStorage.removeItem('todos');
+
+      // Remove all the todo items from the UI
+      while (todoList.firstChild) {
+        todoList.removeChild(todoList.firstChild);
+      }
+    });
+
+    // Attach an event listener that listens for the 'submit' event on the form
+    addTodoForm.addEventListener('submit', event => {
+      // Prevent the default form submission behavior
+      event.preventDefault();
+      console.log(addTodoForm.elements)
+      // Retrieve the value of the 'text' input field from the form
+      todo_input = document.querySelector('#add-todo-input');
+      const text = todo_input.value;
+      todo_input.value = "";
+      // Add the new todo item to the list
+      addTodo(text);
+    });
+    function renderTodos(){
+      // Retrieve the todos array from the local database
+      const savedTodos = JSON.parse(localStorage.getItem('todos'));
+      console.log(savedTodos)
+      while (todoList.firstChild) {
+        todoList.removeChild(todoList.firstChild);
+      }
+
+      // Iterate over the todos array and add each item to the list
+      if (savedTodos) {
+        for (const todo of savedTodos) {
+          addTodo(todo.text, todo.done);
+        }
+      }
+
+    }
+
+    // Define a function to add a new todo item
+    function addTodo(text, done=false) {
+      const id = todos.length; // Use the length of the todos array as the todo item's id
+      const todo = {
+        id: id, // Use the current timestamp as the todo item's id
+        text: text,     // The todo item's text
+        done: done     // Initially, the todo item is not done
+      };
+
+      todos.push(todo); // Add the new todo item to the array
+
+      // Save the updated todos array to the local database
+      localStorage.setItem('todos', JSON.stringify(todos));
+
+      // Create a new list item to display the todo item
+      const todoItem = document.createElement('li');
+
+      // Create a checkbox for the todo item
+      /* const checkbox = document.createElement('input');
+      checkbox.type = 'checkbox';
+      checkbox.checked = todo.done;
+      todoItem.appendChild(checkbox); */
+
+      // Update the background color of the todo item to dark gray
+      todoItem.style.backgroundColor = todo.done ? '#006400' : '#333';
+      todoItem.draggable="true";
+      // Create a label for the todo item
+      const label = document.createElement('label');
+      label.innerText = todo.text;
+
+      // Add an event listener that listens for the 'click' event on the label
+      label.addEventListener('click', event => {
+        // Remove the label from the todo item
+        todoItem.removeChild(label);
+
+        // Create an input element for the todo item
+        const input = document.createElement('input');
+        input.type = 'text';
+        input.value = todo.text;
+        // Add an event listener that listens for the 'blur' event on the input element
+        input.addEventListener('blur', event => {
+            // Update the todo item's text
+            todo.text = input.value;
+
+            // Save the updated todos array to the local database
+            localStorage.setItem('todos', JSON.stringify(todos));
+            // Replace the input element with the label
+            todoItem.replaceChild(label, input);
+            label.innerText = todo.text;
+        });
+        input.addEventListener('keydown', event => {
+          if (event.keyCode === 13) { // Listen for the 'Enter' key
+            // Update the todo item's text
+            todo.text = input.value;
+
+            // Save the updated todos array to the local database
+            localStorage.setItem('todos', JSON.stringify(todos));
+            // Replace the input element with the label
+            todoItem.replaceChild(label, input);
+            label.innerText = todo.text;
+          }
+        });
+
+        // Add the input element to the todo item
+        todoItem.insertBefore(input, markAsDoneButton);
+        input.focus(); // Focus on the input element
+      });
+
+      todoItem.appendChild(label);
+
+      // Create a "Mark as Done" button for the todo item
+      const markAsDoneButton = document.createElement('button');
+      markAsDoneButton.innerText = todo.done?'Mark as Not Done':'Mark as Done';
+      markAsDoneButton.classList.add('mark-as-done-button'); // Add the 'mark-as-done-button' class
+      markAsDoneButton.addEventListener('click', event => {
+        // Mark the todo item as done or undone
+        todo.done = !todo.done;
+        markAsDoneButton.innerText = todo.done?'Mark as Not Done':'Mark as Done';
+        // Save the updated todos array to the local database
+        localStorage.setItem('todos', JSON.stringify(todos));
+
+        // Update the UI to reflect the todo item's new state
+        // checkbox.checked = true;
+        todoItem.style.backgroundColor = todo.done ? '#006400' : '#333';
+        // Check if all todo items are marked as done
+        let allDone = true;
+        for (let todo of todos) {
+          if (!todo.done) {
+            allDone = false;
+            break;
+          }
+        }
+
+        // Show a popup if all todo items are done
+        if (allDone) {
+          alert('All items are done!');
+        }        
+      });
+      todoItem.appendChild(markAsDoneButton);
+
+      // Create a "Remove" button for the todo item
+      const removeButton = document.createElement('button');
+      removeButton.innerText = 'Remove';
+      removeButton.addEventListener('click', event => {
+        // Define the id variable and set it to the id property of the todo object
+        const id = todo.id;        
+        // Remove the todo item from the array
+        const todoIndex = todos.findIndex(todo => todo.id === id);
+        if (todoIndex !== -1) {
+          todos.splice(todoIndex, 1);
+
+          // Save the updated todos array to the local database
+          localStorage.setItem('todos', JSON.stringify(todos));
+
+          // Remove the todo item from the UI
+          todoList.removeChild(todoItem);
+        }
+      });
+      todoItem.appendChild(removeButton);
+
+
+      // DRAG and DROP
+
+      // Attach an event listener that listens for the 'dragstart' event on the todo item
+      todoItem.addEventListener('dragstart', event => {
+        // Set the data that will be transferred when the item is dragged
+        event.dataTransfer.setData('id', todo.id);
+      });
+
+      // Attach an event listener that listens for the 'dragover' event on the todo list
+      todoList.addEventListener('dragover', event => {
+        // Prevent the default behavior (prevent the data from being opened as a link, for example)
+        event.preventDefault();
+      });
+
+      // Define a function to move a todo item to the current position
+      function moveTodo(id, target) {
+        // Find the todo item by id
+        const todo = todos.find(todo => todo.id === id);
+
+        // If the todo item was found
+        if (todo) {
+          // Remove the todo item from its original position
+          const index = todos.indexOf(todo);
+          todos.splice(index, 1);
+
+          // Insert the todo item at the current position
+          const targetIndex = Array.prototype.indexOf.call(target.parentNode.children, target);
+          todos.splice(targetIndex, 0, todo);
+
+          // Save the updated todos array to the local database
+          //localStorage.setItem('todos', JSON.stringify(todos));
+        }
+      }
+
+      // Attach an event listener that listens for the 'drop' event on the todo list
+      todoList.addEventListener('drop', event => {
+        // Get the data that was dropped
+        const id = event.dataTransfer.getData('id');
+        const index = id// todos.findIndex(todo => todo.id === id);
+        // Get the target element (the element the data was dropped on)
+        const target = event.target;
+        console.log("moving")
+        //moveTodo(id, target)
+        // Prevent default behavior (prevent the data from being opened as a link, for example)
+        event.preventDefault();
+
+        renderTodos();
+      });
+
+
+
+      // Add the new todo item to the UI
+      todoList.appendChild(todoItem);
+    }
+
+    function exportTodos() {
+      // Retrieve the todos array from the local database
+      const todos = JSON.parse(localStorage.getItem('todos'));
+
+      // Convert the todos array to a JSON string
+      const todosJson = JSON.stringify(todos);
+
+      // Create a new Blob object with the JSON string
+      const todosBlob = new Blob([todosJson], { type: 'application/json' });
+
+      // Create a new <a> element with the download attribute
+      const downloadLink = document.createElement('a');
+      downloadLink.download = 'todos.json';
+      downloadLink.href = URL.createObjectURL(todosBlob);
+
+      // Trigger a click event on the <a> element
+      downloadLink.click();
+
+      // Revoke the object URL
+      URL.revokeObjectURL(downloadLink.href);
+      console.log("cool")
+    }
+
+    function loadTodos() {
+      // Create a new FileReader object
+      const reader = new FileReader();
+
+      // Set the onload event handler for the FileReader object
+      reader.onload = event => {
+        // Convert the JSON file to an array using JSON.parse()
+        const todos = JSON.parse(event.target.result);
+        console.log(todos)
+
+        // Render the todo list
+        localStorage.setItem('todos', JSON.stringify(todos));
+        renderTodos();
+      };
+
+      // Read the contents of the selected file
+      reader.readAsText(event.target.files[0]);
+    }
+    
+
+    // Attach an event listener that listens for the 'load' event
+    window.addEventListener('load', event => {
+      renderTodos();
+    });    
+</script>
+</body>
+</html>
