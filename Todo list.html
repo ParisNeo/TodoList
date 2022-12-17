@@ -4,115 +4,140 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Todo App</title>
-  <style>
-    /* The CSS styles for the todo app */
+  <style>    /* The CSS styles for the todo app */
     body {
-      background-color: #333;
-      color: #fff;
-    }
-    button {
-      background-color: #222;
-      border-style: none;
-      color: #fff;
-      padding: 5px 10px;
-      border-radius: 5px;
-    }
+        background-color: #333;
+        color: #fff;
+      }
+      h1 {
+        text-align: center;
+      }      
+      button {
+        background-color: #222;
+        border-style: none;
+        color: #fff;
+        padding: 5px 10px;
+        border-radius: 5px;
+        margin: 2px;
+      }
+  
+      button:hover {
+        background-color: #555;
+      }
+      #todo-app {
+        display: flex;
+        flex-direction: column;
+        height: 100%;
+        margin: 0 auto;
+        max-width: 600px;
+        padding: 20px;
+      }
+  
+      #todo-app > footer {
+        align-self: center;
+        margin-top: auto;
+        text-align: center;
+      }
+      #add-todo-form {
+        display: flex;
+      }
+      input[type="file"] {
+        visibility: hidden;
+        margin: 2px;
+      }
+      .button {
+        background-color: #222;
+        border-style: none;
+        border-radius: 5px;
+        border: none;
+        color: #fff;
+        cursor: pointer;
+        padding: 5px 10px;
+        margin: 2px;
+        text-align: center;
+      }
 
-    button:hover {
-      background-color: #555;
-    }
-    #todo-app {
-      display: flex;
-      flex-direction: column;
-      height: 100%;
-      margin: 0 auto;
-      max-width: 600px;
-      padding: 20px;
-    }
+      .button:hover {
+        background-color: #555;
+      }
+      #add-todo-input {
+        flex: 1;
+        height: 30px;
+        padding: 5px;
+        margin: 2px;
 
-    #todo-app > footer {
-      align-self: center;
-      margin-top: auto;
-      text-align: center;
-    }
-    #add-todo-form {
-      display: flex;
-    }
+      }
+  
+      #todo-list {
+        background-color: #333;
+        margin: 20px 0;
+        padding: 0;
+      }
+  
+      #todo-list li {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 10px;
+        height: 50px;
+      }
+  
+      #todo-list button {
+        background-color: #222;
+        border-style: none;
+        border-radius: 5px;
+        border: none;
+        color: #fff;
+        cursor: pointer;
+        padding: 5px 10px;
+        height: 50px; /* The height of the list items */
+      }
+      #todo-list button:hover {
+        background-color: #555;
+      }
+      input[type="text"] {
+        background-color: #222;
+        border-style: none;
+        color: #fff;
+        padding: 5px 10px;
+        border-top-left-radius: 5px;
+        border-bottom-left-radius: 5px;
+      }
+      input[type="submit"] {
+        background-color: #222;
+        border-top-right-radius: 5px;
+        border-bottom-right-radius: 5px;
+        border-top-left-radius: 0px;
+        border-bottom-left-radius: 0px;
+        border-style: none;
+        border: none;
+        color: #fff;
+        cursor: pointer;
+        padding: 5px 10px;
+      }
+  
+      input[type="submit"]:hover {
+        background-color: #333;
+      }
+      #todo-list input[type="checkbox"] {
+        margin-right: 10px;
+      }
+      .mark-as-done-button {
+        margin-left: auto;
+        border-top-left-radius: 5px;
+        border-bottom-left-radius: 5px;
+        border-top-right-radius: 0px;
+        border-bottom-right-radius: 0px;      
+      }
+      .mark-as-done-button {
+        margin-left: auto;
+        border-top-right-radius: 5px;
+        border-bottom-right-radius: 5px;
+        border-top-right-radius: 0px;
+        border-bottom-right-radius: 0px;      
+      }
+      </style>
 
-    #add-todo-input {
-      flex: 1;
-      height: 30px;
-      padding: 5px;
-    }
-
-    #todo-list {
-      margin: 20px 0;
-      padding: 0;
-    }
-
-    #todo-list li {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 10px;
-      height: 50px;
-    }
-
-    #todo-list button {
-      background-color: #222;
-      border-style: none;
-      border-radius: 5px;
-      border: none;
-      color: #fff;
-      cursor: pointer;
-      padding: 5px 10px;
-      height: 50px; /* The height of the list items */
-    }
-    #todo-list button:hover {
-      background-color: #333;
-    }
-    input[type="text"] {
-      background-color: #222;
-      border-style: none;
-      color: #fff;
-      padding: 5px 10px;
-      border-top-left-radius: 5px;
-      border-bottom-left-radius: 5px;
-    }
-    input[type="submit"] {
-      background-color: #222;
-      border-top-right-radius: 5px;
-      border-bottom-right-radius: 5px;
-      border-top-left-radius: 0px;
-      border-bottom-left-radius: 0px;
-      border-style: none;
-      border: none;
-      color: #fff;
-      cursor: pointer;
-      padding: 5px 10px;
-    }
-
-    input[type="submit"]:hover {
-      background-color: #333;
-    }
-    #todo-list input[type="checkbox"] {
-      margin-right: 10px;
-    }
-    .mark-as-done-button {
-      margin-left: auto;
-      border-top-left-radius: 5px;
-      border-bottom-left-radius: 5px;
-      border-top-right-radius: 0px;
-      border-bottom-right-radius: 0px;      
-    }
-    .mark-as-done-button {
-      margin-left: auto;
-      border-top-right-radius: 5px;
-      border-bottom-right-radius: 5px;
-      border-top-right-radius: 0px;
-      border-bottom-right-radius: 0px;      
-    }
-  </style>
 </head>
 <body>
   <div id="todo-app">
@@ -123,11 +148,12 @@
       <input type="text" id="add-todo-input" placeholder="Enter a new todo item" />
       <button type="submit">Add Todo</button>
     </form>
-    <div style="display: flex;">
+    <div style="display: flex; visibility: hidden;">
       <!-- Export and import buttons -->
-      <button onclick="exportTodos()">Export</button>
-      Import<input type="file" id="import-todos" class="import-button" accept=".json"  onchange="loadTodos()" />
+      <input type="file" id="import-todos" class="import-button" accept=".json"  onchange="loadTodos()" />
     </div>        
+    <label class="button" for="import-todos">Import</label>
+    <button onclick="exportTodos()">Export</button>
     <button id="clear-todo-list">Clear Todo List</button>
     <!-- A list to display the todo items -->
     <ul id="todo-list">
