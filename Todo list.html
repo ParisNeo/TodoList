@@ -299,6 +299,11 @@
         markAsDoneButton.innerText = todo.done?'Mark as Not Done':'Mark as Done';
         // Save the updated todos array to the local database
         localStorage.setItem('todos', JSON.stringify(todos));
+        if (todo.done) {
+          todoList.appendChild(todoItem);
+        } else {
+          todoList.prepend(todoItem);
+        }
 
         // Update the UI to reflect the todo item's new state
         // checkbox.checked = true;
@@ -392,7 +397,13 @@
 
 
       // Add the new todo item to the UI
-      todoList.appendChild(todoItem);
+      //todoList.appendChild(todoItem);
+      if (done) {
+        todoList.appendChild(todoItem);
+      } else {
+        todoList.prepend(todoItem);
+      }
+
     }
 
     function exportTodos() {
