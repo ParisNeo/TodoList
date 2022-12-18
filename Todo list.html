@@ -11,6 +11,38 @@
       }
       h1 {
         text-align: center;
+      }     
+      
+      input[type="text"] {
+        box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+        background-color: #222;
+        border-style: none;
+        color: #fff;
+        border-top-left-radius: 5px;
+        border-bottom-left-radius: 5px;
+      }
+      #settings{
+        height: 0;
+        overflow: hidden;
+        transition: height 0.5s;
+      }
+ 
+      #submit_form {
+        box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+        background-color: #222;
+        border-top-right-radius: 5px;
+        border-bottom-right-radius: 5px;
+        border-top-left-radius: 0px;
+        border-bottom-left-radius: 0px;
+        border-style: none;
+        border: none;
+        color: #fff;
+        cursor: pointer;
+        padding: 5px 10px;
+        margin-left: 0px;
+      }
+      #submit_form:hover {
+        background-color: #333;
       }      
       button {
         background-color: #222;
@@ -20,9 +52,19 @@
         border-radius: 5px;
         margin: 2px;
       }
+      div {
+        display: flex;
+        flex-direction: column;
+        transition: all 0.5s ease-in-out;
+      }      
+      div{
+        box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+      }
       button:hover {
+        box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
         background-color: #555;
       }
+
       #todo-app {
         display: flex;
         flex-direction: column;
@@ -40,23 +82,24 @@
       #add-todo-form {
         display: flex;
       }
+      
       input[type="file"] {
         visibility: hidden;
         margin: 2px;
       }
+
       .button {
+        text-align: center;
         background-color: #222;
         border-style: none;
-        border-radius: 5px;
-        border: none;
         color: #fff;
-        cursor: pointer;
         padding: 5px 10px;
+        border-radius: 5px;
         margin: 2px;
-        text-align: center;
       }
 
       .button:hover {
+        box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
         background-color: #555;
       }
       #add-todo-input {
@@ -68,6 +111,7 @@
       }
   
       #todo-list {
+        box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
         border-style: dashed;
         border-color: black;
         border-width: 1px;
@@ -98,30 +142,8 @@
       #todo-list button:hover {
         background-color: #555;
       }
-      input[type="text"] {
-        background-color: #222;
-        border-style: none;
-        color: #fff;
-        padding: 5px 10px;
-        border-top-left-radius: 5px;
-        border-bottom-left-radius: 5px;
-      }
-      input[type="submit"] {
-        background-color: #222;
-        border-top-right-radius: 5px;
-        border-bottom-right-radius: 5px;
-        border-top-left-radius: 0px;
-        border-bottom-left-radius: 0px;
-        border-style: none;
-        border: none;
-        color: #fff;
-        cursor: pointer;
-        padding: 5px 10px;
-      }
-  
-      input[type="submit"]:hover {
-        background-color: #333;
-      }
+      
+
       #todo-list input[type="checkbox"] {
         margin-right: 10px;
       }
@@ -149,15 +171,15 @@
     <!-- A form to add new todo items -->
     <form id="add-todo-form">
       <input type="text" id="add-todo-input" placeholder="Enter a new todo item" />
-      <button type="submit">Add Todo</button>
-    </form>
-    <div style="display: flex; visibility: hidden;">
+      <button type="submit" id="submit_form">Add Todo</button>
+    </form><button id="show-div-button">Show settings</button>
+    <input type="file" id="import-todos" class="import-button" accept=".json"  onchange="loadTodos()" />
+    <div id="settings">
+      <label class="button" for="import-todos">Import</label>
+      <button onclick="exportTodos()">Export</button>
+      <button id="clear-todo-list">Clear Todo List</button>
       <!-- Export and import buttons -->
-      <input type="file" id="import-todos" class="import-button" accept=".json"  onchange="loadTodos()" />
     </div>        
-    <label class="button" for="import-todos">Import</label>
-    <button onclick="exportTodos()">Export</button>
-    <button id="clear-todo-list">Clear Todo List</button>
     <!-- A list to display the todo items -->
     <ul id="todo-list">
     </ul>
@@ -452,7 +474,20 @@
     // Attach an event listener that listens for the 'load' event
     window.addEventListener('load', event => {
       renderTodos();
-    });    
+    });
+    const div = document.querySelector('#todo-app > div');
+    const button = document.querySelector('#show-div-button');
+    div.style.height = '0'; // Hide the div element
+    button.addEventListener('click', event => {
+      if (div.style.height === '0px') {
+        button.innerHTML = "Hide settings";
+        div.style.height = 'auto';
+      } else {
+        button.innerHTML = "Show settings";
+        div.style.height = 0;
+      }
+    });
+
 </script>
 </body>
 </html>
