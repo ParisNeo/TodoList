@@ -1,7 +1,7 @@
 # <img src="logo.png" alt="image alt text" title="image title" width="25px" height="25px"> TodoList
 A simple webapp to build a todolist built in collaboration with chatgpt from open ai.
 ![Todo list](img/Todolist.png)
-
+https://img.shields.io/github/license/parisneo/todolist
 ## Freatures
 - Only frontend. No backend required
 - Your data is concerved on your device (no internet backup)
