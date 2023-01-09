@@ -177,6 +177,19 @@
         border-top-right-radius: 0px;
         border-bottom-right-radius: 0px;      
       }
+      #audio_input_language{
+        background-color: #222;
+        border-style: none;
+        border-radius: 5px;
+        border: none;
+        color: #fff;
+        cursor: pointer;
+        padding: 5px 10px;
+        height: 50px; /* The height of the list items */
+      }
+      #audio_input_language:hover {
+        background-color: #555;
+      }      
       </style>
 
 </head>
@@ -187,6 +200,12 @@
     <!-- A form to add new todo items -->
     <form id="add-todo-form">
       <input type="text" id="add-todo-input" placeholder="Enter a new todo item" />
+      <button id="audio_input_button" >🎤</button>
+      <select id="audio_input_language">
+        <option value="fr-FR">Français</option>
+        <option value="en-US">English</option>
+        <option value="es-ES">Español</option>
+      </select>
       <button type="submit" id="submit_form">Add Todo</button>
     </form><button id="show-div-button">Show settings</button>
     <input type="file" id="import-todos" class="import-button" accept=".json"  onchange="loadTodos()" />
@@ -220,6 +239,43 @@
 
 
   <script>
+
+
+    const SpeechRecognition = window.SpeechRecognition || webkitSpeechRecognition;
+    const recognition = new SpeechRecognition();
+    recognition.continuous = true;
+    recognition.interimResults = true;
+    recognition.maxAlternatives = 10
+    let isStarted = false;
+
+    const mic_button = document.querySelector("#audio_input_button");
+    const select = document.querySelector("#audio_input_language");
+    const input = document.querySelector("#add-todo-input");
+    
+    mic_button.addEventListener("click", () => {
+    if (isStarted) {
+      console.log("Stopping previous recognition")
+      recognition.stop();
+      isStarted = false;
+    } else {
+      console.log("Starting new recognition")
+      recognition.lang = select.value;
+      recognition.start();
+      isStarted = true;
+    }
+  });
+  
+  recognition.addEventListener("result", (event) => {
+      let transcript = "";
+      for (const result of event.results) {
+        transcript += result[0].transcript;
+      }
+      input.value = transcript;
+  });
+
+  
+
+
     // Define an array to store the todo items
     const todos = [];
 
