@@ -200,13 +200,15 @@
     <!-- A form to add new todo items -->
     <form id="add-todo-form">
       <input type="text" id="add-todo-input" placeholder="Enter a new todo item" />
+      <button type="submit" id="submit_form">Add Todo</button>
+      <br>
       <button id="audio_input_button" >🎤</button>
       <select id="audio_input_language">
         <option value="fr-FR">Français</option>
         <option value="en-US">English</option>
         <option value="es-ES">Español</option>
       </select>
-      <button type="submit" id="submit_form">Add Todo</button>
+
     </form><button id="show-div-button">Show settings</button>
     <input type="file" id="import-todos" class="import-button" accept=".json"  onchange="loadTodos()" />
     <div id="settings">
