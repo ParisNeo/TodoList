@@ -200,18 +200,20 @@
     <!-- A form to add new todo items -->
     <form id="add-todo-form">
       <input type="text" id="add-todo-input" placeholder="Enter a new todo item" />
-      <button type="submit" id="submit_form">Add Todo</button>
-      <br>
       <button id="audio_input_button" >🎤</button>
+      <button type="submit" id="submit_form">Add Todo</button>
+
+    </form><button id="show-div-button">Show settings</button>
+    <input type="file" id="import-todos" class="import-button" accept=".json"  onchange="loadTodos()" />
+    <div id="settings">
+      <div style="flex-direction: row; display: flex; text-align: center;">
+      <label for="audio_input_language" style="margin: 10px;">Language : </label>
       <select id="audio_input_language">
         <option value="fr-FR">Français</option>
         <option value="en-US">English</option>
         <option value="es-ES">Español</option>
       </select>
-
-    </form><button id="show-div-button">Show settings</button>
-    <input type="file" id="import-todos" class="import-button" accept=".json"  onchange="loadTodos()" />
-    <div id="settings">
+     </div>
       <label class="button" for="import-todos">Import</label>
       <button onclick="exportTodos()">Export</button>
       <button id="clear-todo-list">Clear Todo List</button>
