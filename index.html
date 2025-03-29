@@ -1,582 +1,1337 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Todo App</title>
-  <link rel="shortcut icon" type="image/x-icon" href="logo.ico">
-  <!-- twitter -->
-  <meta name="twitter:card" content="a_todo_list_webapp">
-  <meta name="twitter:site" content="@SpaceNerduino">
-  <meta name="twitter:title" content="TodoList">
-  <meta name="twitter:description" content="A simple todolist webb app">
-  <meta name="twitter:image" content="https://parisneo.github.io/TodoList/logo.jpg">
-  <meta name="twitter:url" content="https://parisneo.github.io/TodoList/">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.1/css/all.min.css" integrity="sha512-4zCK9k+qNFUR5X+cKL9EIR+ZOhtIloNl9GIKS57V1MyNsYpYcUrUeQc9vNfzsWfV28IaLL3i96P9sdNyeRssA==" crossorigin="anonymous" />  
-  <!-- Fazcebook -->
-  <meta property="og:url" content="https://parisneo.github.io/TodoList/">
-  <meta property="og:type" content="website">
-  <meta property="og:title" content="TodoList">
-  <meta property="og:description" content="A simple todolist webb app">
-  <meta property="og:image" content="https://parisneo.github.io/TodoList/logo.jpg">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>Grocery List Deluxe</title>
+    <link rel="shortcut icon" type="image/x-icon" href="logo.ico"> <!-- Make sure you have a logo.ico -->
 
-  <style>    /* The CSS styles for the todo app */
-    body {
-        background-color: #333;
-        color: #fff;
-      }
-      h1 {
-        text-align: center;
-      }     
-      
-      input[type="text"] {
-        box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
-        background-color: #222;
-        border-style: none;
-        color: #fff;
-        border-top-left-radius: 5px;
-        border-bottom-left-radius: 5px;
-      }
-      #settings{
-        height: 0;
-        overflow: hidden;
-        transition: height 0.5s;
-      }
- 
-      #submit_form {
-        box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
-        background-color: #222;
-        border-top-right-radius: 5px;
-        border-bottom-right-radius: 5px;
-        border-top-left-radius: 0px;
-        border-bottom-left-radius: 0px;
-        border-style: none;
-        border: none;
-        color: #fff;
-        cursor: pointer;
-        padding: 5px 10px;
-        margin-left: 0px;
-      }
-      #submit_form:hover {
-        background-color: #333;
-      }      
-      button {
-        background-color: #222;
-        border-style: none;
-        color: #fff;
-        padding: 5px 10px;
-        border-radius: 5px;
-        margin: 2px;
-      }
-      div {
-        display: flex;
-        flex-direction: column;
-        transition: all 0.5s ease-in-out;
-      }      
-      div{
-        box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
-      }
-      button:hover {
-        box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
-        background-color: #555;
-      }
+    <!-- Social Media Meta Tags (Optional but good practice) -->
+    <meta name="description" content="A smart grocery list app with history and suggestions.">
+    <!-- Add other meta tags (Twitter, Facebook/OG) if desired -->
 
-      #todo-app {
-        display: flex;
-        flex-direction: column;
-        height: 100%;
-        margin: 0 auto;
-        max-width: 600px;
-        padding: 20px;
-      }
-  
-      #todo-app > footer {
-        align-self: center;
-        margin-top: auto;
-        text-align: center;
-      }
-      #add-todo-form {
-        display: flex;
-      }
-      
-      input[type="file"] {
-        visibility: hidden;
-        margin: 2px;
-      }
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" integrity="sha512-iecdLmaskl7CVkqkXNQ/ZH/XLlvWZOJyj7Yy7tcenmpD1ypASozpmT/E0iPtmFIB46ZmdtAc9eNBvH0H/ZpiBw==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
 
-      .button {
-        text-align: center;
-        background-color: #222;
-        border-style: none;
-        color: #fff;
-        padding: 5px 10px;
-        border-radius: 5px;
-        margin: 2px;
-      }
+    <style>
+        :root {
+            --bg-gradient: linear-gradient(to bottom right, #3a506b, #1c2541); /* Example gradient */
+            --glass-bg-light: rgba(255, 255, 255, 0.1);
+            --glass-bg-medium: rgba(255, 255, 255, 0.15);
+            --glass-bg-dark: rgba(0, 0, 0, 0.2);
+            --glass-border-color: rgba(255, 255, 255, 0.18);
+            --text-color: #f0f0f0;
+            --text-color-muted: #a0a0a0;
+            --accent-color: #5bc0be; /* Teal accent */
+            --accent-color-darker: #3a8e8c;
+            --done-color-bg: rgba(91, 192, 190, 0.2); /* Faded accent for done items */
+            --danger-color: #d9534f;
+            --danger-color-darker: #c9302c;
+            --blur-amount-heavy: 15px;
+            --blur-amount-light: 8px;
+            --border-radius-large: 15px;
+            --border-radius-medium: 10px;
+            --border-radius-small: 6px;
+            --shadow-color: rgba(31, 38, 135, 0.3);
+        }
 
-      .button:hover {
-        box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
-        background-color: #555;
-      }
-      #add-todo-input {
-        flex: 1;
-        height: 30px;
-        padding: 5px;
-        margin: 2px;
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
 
-      }
-  
-      #todo-list {
-        box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
-        border-style: dashed;
-        border-color: black;
-        border-width: 1px;
-        background-color: #333;
-        margin: 20px 0;
-        padding: 0;
-      }
-  
-      #todo-list li {
-        border-width: 1px;
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        padding: 10px;
-        height: 50px;
-      }
-  
-      #todo-list button {
-        background-color: #222;
-        border-style: none;
-        border-radius: 5px;
-        border: none;
-        color: #fff;
-        cursor: pointer;
-        padding: 5px 10px;
-        height: 50px; /* The height of the list items */
-      }
-      #todo-list button:hover {
-        background-color: #555;
-      }
-      
+        html {
+             height: 100%; /* Ensure html takes full height */
+        }
 
-      #todo-list input[type="checkbox"] {
-        margin-right: 10px;
-      }
-      .mark-as-done-button {
-        margin-left: auto;
-        border-top-left-radius: 5px;
-        border-bottom-left-radius: 5px;
-        border-top-right-radius: 0px;
-        border-bottom-right-radius: 0px;      
-      }
-      .mark-as-done-button {
-        margin-left: auto;
-        border-top-right-radius: 5px;
-        border-bottom-right-radius: 5px;
-        border-top-right-radius: 0px;
-        border-bottom-right-radius: 0px;      
-      }
-      #audio_input_language{
-        background-color: #222;
-        border-style: none;
-        border-radius: 5px;
-        border: none;
-        color: #fff;
-        cursor: pointer;
-        padding: 5px 10px;
-        height: 50px; /* The height of the list items */
-      }
-      #audio_input_language:hover {
-        background-color: #555;
-      }      
-      </style>
+        body {
+            font-family: 'Poppins', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background: var(--bg-gradient);
+            background-attachment: fixed;
+            color: var(--text-color);
+            min-height: 100vh; /* Ensure body takes at least full viewport height */
+            display: flex; /* Use flex to center content */
+            justify-content: center;
+            align-items: flex-start; /* Align container to top */
+            padding: 20px; /* Add padding around the container */
+            -webkit-tap-highlight-color: transparent; /* Disable tap highlight on touch devices */
+        }
+
+        #grocery-app {
+            width: 100%;
+            max-width: 700px; /* Increased max-width */
+            background: var(--glass-bg-dark);
+            backdrop-filter: blur(var(--blur-amount-heavy));
+            -webkit-backdrop-filter: blur(var(--blur-amount-heavy));
+            border: 1px solid var(--glass-border-color);
+            border-radius: var(--border-radius-large);
+            box-shadow: 0 8px 32px 0 var(--shadow-color);
+            padding: 25px 30px; /* More padding */
+            display: flex;
+            flex-direction: column;
+            gap: 20px; /* Spacing between sections */
+        }
+
+        h1 {
+            text-align: center;
+            font-weight: 600;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+        h1 img { /* If using an image logo */
+           height: 30px;
+           width: auto;
+        }
+
+        /* Form Styling */
+        #add-item-form {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap; /* Allow wrapping on smaller screens */
+        }
+
+        #add-item-form input[type="text"] {
+            flex-grow: 1; /* Take available space */
+            min-width: 150px; /* Minimum width before wrapping */
+        }
+
+        #item-quantity {
+            width: 80px; /* Fixed width for quantity */
+        }
+
+        input[type="text"], select {
+            background: var(--glass-bg-light);
+            border: 1px solid var(--glass-border-color);
+            color: var(--text-color);
+            border-radius: var(--border-radius-small);
+            padding: 10px 12px;
+            font-size: 1rem;
+            transition: background-color 0.2s ease, box-shadow 0.2s ease;
+        }
+        input[type="text"]::placeholder {
+            color: var(--text-color-muted);
+            opacity: 0.8;
+        }
+        input[type="text"]:focus, select:focus {
+            background-color: var(--glass-bg-medium);
+            outline: none;
+            box-shadow: 0 0 10px rgba(91, 192, 190, 0.3); /* Subtle glow */
+        }
+
+        /* Buttons */
+        button {
+            background: var(--glass-bg-medium);
+            border: 1px solid var(--glass-border-color);
+            color: var(--text-color);
+            border-radius: var(--border-radius-small);
+            padding: 10px 15px;
+            cursor: pointer;
+            font-size: 1rem;
+            font-family: inherit;
+            transition: background-color 0.2s ease, transform 0.1s ease;
+            display: inline-flex; /* Align icon and text */
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+        button:hover {
+            background-color: var(--glass-bg-light);
+            border-color: rgba(255, 255, 255, 0.3);
+        }
+        button:active {
+             transform: scale(0.98);
+        }
+        button i { /* Icon styling */
+            font-size: 1em; /* Make icon slightly larger than text */
+            line-height: 1; /* Prevent extra space */
+        }
+
+        #submit-item-button {
+            background-color: var(--accent-color);
+            border-color: var(--accent-color);
+            color: #fff;
+            font-weight: 600;
+            flex-shrink: 0; /* Don't shrink add button */
+        }
+        #submit-item-button:hover {
+            background-color: var(--accent-color-darker);
+            border-color: var(--accent-color-darker);
+        }
+         #audio-input-button.recording { /* Style for recording state */
+            background-color: var(--danger-color);
+            color: white;
+            animation: pulse 1.5s infinite;
+        }
+         @keyframes pulse {
+            0% { box-shadow: 0 0 5px 0px var(--danger-color); }
+            50% { box-shadow: 0 0 10px 5px var(--danger-color); }
+            100% { box-shadow: 0 0 5px 0px var(--danger-color); }
+        }
+
+        /* Suggestions Dropdown */
+        #suggestions-list {
+            list-style-type: none;
+            margin-top: -10px; /* Overlap slightly with input */
+            max-height: 150px;
+            overflow-y: auto;
+            background: var(--glass-bg-medium);
+             backdrop-filter: blur(var(--blur-amount-light));
+             -webkit-backdrop-filter: blur(var(--blur-amount-light));
+            border: 1px solid var(--glass-border-color);
+            border-top: none; /* Remove top border */
+            border-radius: 0 0 var(--border-radius-medium) var(--border-radius-medium);
+            position: absolute; /* Position relative to form or container */
+            width: calc(100% - 180px); /* Adjust based on quantity/button width */
+            z-index: 10;
+            padding: 5px 0;
+        }
+        #suggestions-list li {
+            padding: 8px 15px;
+            cursor: pointer;
+            transition: background-color 0.2s ease;
+        }
+        #suggestions-list li:hover {
+            background-color: var(--accent-color-darker);
+        }
+
+
+        /* Filter/Sort Controls */
+        .controls {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 10px;
+            flex-wrap: wrap;
+            padding: 10px;
+            background: var(--glass-bg-light);
+            border-radius: var(--border-radius-medium);
+            border: 1px solid var(--glass-border-color);
+            margin-top: 10px; /* Add space above controls */
+        }
+        .controls label {
+            margin-right: 5px;
+            font-size: 0.9rem;
+        }
+        .controls select {
+            padding: 8px 10px;
+            font-size: 0.9rem;
+        }
+
+        /* Grocery List Styling */
+        #grocery-list {
+            list-style: none;
+            margin-top: 10px;
+            max-height: 50vh; /* Limit height and allow scrolling */
+            overflow-y: auto;
+            padding-right: 5px; /* Space for scrollbar */
+        }
+        /* Custom Scrollbar */
+        #grocery-list::-webkit-scrollbar { width: 8px; }
+        #grocery-list::-webkit-scrollbar-track { background: var(--glass-bg-light); border-radius: 4px;}
+        #grocery-list::-webkit-scrollbar-thumb { background: var(--glass-bg-medium); border-radius: 4px;}
+        #grocery-list::-webkit-scrollbar-thumb:hover { background: var(--accent-color); }
+
+        #grocery-list li {
+            background: var(--glass-bg-light);
+             backdrop-filter: blur(var(--blur-amount-light));
+             -webkit-backdrop-filter: blur(var(--blur-amount-light));
+            border: 1px solid var(--glass-border-color);
+            border-radius: var(--border-radius-medium);
+            margin-bottom: 12px;
+            padding: 12px 15px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            transition: background-color 0.3s ease, opacity 0.3s ease;
+            position: relative; /* For absolute positioning of buttons if needed */
+            cursor: grab; /* Indicate draggable */
+        }
+        #grocery-list li.dragging {
+            opacity: 0.5;
+            background: var(--glass-bg-medium);
+        }
+        #grocery-list li.drag-over { /* Highlight drop target */
+            border-bottom: 2px solid var(--accent-color);
+        }
+
+        .item-checkbox {
+            appearance: none;
+            width: 20px;
+            height: 20px;
+            border: 2px solid var(--glass-border-color);
+            border-radius: 50%; /* Circle checkbox */
+            cursor: pointer;
+            position: relative;
+            flex-shrink: 0;
+             transition: background-color 0.2s ease, border-color 0.2s ease;
+        }
+        .item-checkbox:checked {
+            background-color: var(--accent-color);
+            border-color: var(--accent-color);
+        }
+        .item-checkbox:checked::after { /* Checkmark */
+            content: '\f00c'; /* Font Awesome check */
+            font-family: 'Font Awesome 6 Free';
+            font-weight: 900;
+            font-size: 12px;
+            color: #fff;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+        }
+
+        .item-details {
+            flex-grow: 1;
+            display: flex; /* Use flex for text and quantity */
+            flex-direction: column; /* Stack text and quantity */
+            overflow: hidden; /* Prevent long text overflow */
+        }
+        .item-text {
+            font-size: 1rem;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            transition: opacity 0.3s ease;
+        }
+        .item-quantity-display {
+            font-size: 0.85rem;
+            color: var(--text-color-muted);
+            margin-top: 2px;
+        }
+
+        /* Editing State */
+         .item-details input[type="text"] {
+            width: 100%;
+            margin-bottom: 5px; /* Space between edit inputs */
+         }
+
+        /* Done State */
+        #grocery-list li.done {
+            background: var(--done-color-bg);
+             backdrop-filter: blur(var(--blur-amount-light)); /* Keep blur */
+             -webkit-backdrop-filter: blur(var(--blur-amount-light));
+        }
+        #grocery-list li.done .item-text,
+        #grocery-list li.done .item-quantity-display {
+            text-decoration: line-through;
+            opacity: 0.6;
+        }
+
+        .item-actions {
+            display: flex;
+            gap: 8px;
+            flex-shrink: 0; /* Prevent buttons shrinking */
+        }
+        .item-actions button {
+            padding: 5px 8px; /* Smaller buttons */
+            font-size: 0.9rem;
+            background: transparent; /* Make action buttons subtle */
+            border: none;
+             color: var(--text-color-muted);
+        }
+         .item-actions button:hover {
+             background: var(--glass-bg-light);
+             color: var(--text-color);
+         }
+         .item-actions .remove-button { color: var(--danger-color); }
+         .item-actions .remove-button:hover { color: white; background-color: var(--danger-color); }
+         .item-actions .edit-button { color: var(--accent-color); }
+         .item-actions .edit-button:hover { color: white; background-color: var(--accent-color); }
+
+        /* Settings Area */
+        #settings-toggle {
+            align-self: center; /* Center the toggle button */
+            margin-top: 15px; /* Space above toggle */
+        }
+        #settings {
+            max-height: 0; /* Start hidden */
+            overflow: hidden;
+            transition: max-height 0.5s ease-out, padding 0.5s ease-out;
+            background: var(--glass-bg-light);
+            border: 1px solid var(--glass-border-color);
+            border-radius: var(--border-radius-medium);
+            padding: 0 20px; /* No padding when hidden */
+            margin-top: 15px;
+        }
+        #settings.open {
+             max-height: 500px; /* Adjust as needed */
+             padding: 20px;
+        }
+        .settings-content {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+        .settings-row {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+         .settings-row label {
+             min-width: 80px; /* Align selects */
+         }
+         .settings-content button, .settings-content label.button-like {
+             width: 100%; /* Full width buttons in settings */
+             justify-content: center; /* Center text/icon in button */
+         }
+         /* Style label like a button */
+         .button-like {
+            display: inline-block;
+            text-align: center;
+            background: var(--glass-bg-medium);
+            border: 1px solid var(--glass-border-color);
+            color: var(--text-color);
+            border-radius: var(--border-radius-small);
+            padding: 10px 15px;
+            cursor: pointer;
+            transition: background-color 0.2s ease;
+         }
+         .button-like:hover {
+             background-color: var(--glass-bg-light);
+         }
+        input[type="file"] { display: none; } /* Hide default file input */
+
+
+        /* Empty List Message */
+        #empty-list-message {
+            text-align: center;
+            color: var(--text-color-muted);
+            padding: 30px;
+            display: none; /* Hidden by default */
+        }
+        #empty-list-message.visible {
+            display: block;
+        }
+
+        /* Footer */
+        footer {
+            text-align: center;
+            margin-top: 30px;
+            font-size: 0.85rem;
+            color: var(--text-color-muted);
+            opacity: 0.7;
+        }
+        footer a {
+            color: var(--accent-color);
+            text-decoration: none;
+            margin: 0 5px;
+            transition: color 0.2s ease;
+        }
+        footer a:hover {
+            color: var(--text-color);
+        }
+        footer svg {
+            vertical-align: middle;
+            height: 20px; /* Consistent icon size */
+            width: auto;
+            fill: var(--accent-color); /* Default fill */
+            transition: fill 0.2s ease;
+        }
+         footer a:hover svg {
+            fill: var(--text-color);
+         }
+          /* Specific SVG overrides if needed */
+         footer a[href*="twitter.com"] svg path { fill: #1DA1F2; }
+         footer a[href*="linkedin.com"] svg path[fill="#007EBB"] { fill: #007EBB; } /* Target specific path */
+         footer a[href*="facebook.com"] svg .cls-1 { fill: #1877F2; } /* Target specific class */
+
+
+        /* Responsive Adjustments */
+        @media (max-width: 600px) {
+            body { padding: 10px; }
+            #grocery-app { padding: 20px 15px; }
+            h1 { font-size: 1.8rem; }
+            #add-item-form { flex-direction: column; } /* Stack inputs vertically */
+            #add-item-form input[type="text"], #item-quantity { width: 100%; }
+            #suggestions-list { width: 100%; } /* Full width suggestions on mobile */
+            .controls { flex-direction: column; align-items: stretch; }
+            .controls div { display: flex; justify-content: space-between; width: 100%; }
+            #grocery-list li { gap: 10px; padding: 10px; }
+            .item-checkbox { width: 18px; height: 18px; }
+            .item-text { font-size: 0.95rem; }
+            .item-quantity-display { font-size: 0.8rem; }
+            .item-actions { gap: 5px; }
+            .item-actions button { padding: 4px 6px; font-size: 0.8rem; }
+            footer { font-size: 0.8rem; }
+        }
+    </style>
 
 </head>
 <body>
-  <div id="todo-app">
-    <h1><img src="https://parisneo.github.io/TodoList/logo.png" alt="" title="image title" width="25px" height="25px"> Todo List</h1>
+    <div id="grocery-app">
+        <h1><i class="fas fa-shopping-cart"></i> Grocery List</h1>
 
-    <!-- A form to add new todo items -->
-    <form id="add-todo-form">
-      <input type="text" id="add-todo-input" placeholder="Enter a new todo item" />
-      <button id="audio_input_button" >🎤</button>
-      <button type="submit" id="submit_form">Add Todo</button>
-
-    </form><button id="show-div-button">Show settings</button>
-    <input type="file" id="import-todos" class="import-button" accept=".json"  onchange="loadTodos()" />
-    <div id="settings">
-      <div style="flex-direction: row; display: flex; text-align: center;">
-      <label for="audio_input_language" style="margin: 10px;">Language : </label>
-      <select id="audio_input_language">
-        <option value="fr-FR">Français</option>
-        <option value="en-US">English</option>
-        <option value="es-ES">Español</option>
-      </select>
-     </div>
-      <label class="button" for="import-todos">Import</label>
-      <button onclick="exportTodos()">Export</button>
-      <button id="clear-todo-list">Clear Todo List</button>
-      <!-- Export and import buttons -->
-    </div>        
-    <!-- A list to display the todo items -->
-    <ul id="todo-list">
-    </ul>
-  <!-- The footer -->
-  <footer>
-    This app is built by Saif with the help of ChatGPT<br>
-    <a href="https://twitter.com/share?url=https://parisneo.github.io/TodoList/&text=Here is a live Todolist app built with the help of chatgpt: TodoList" target="_blank">
-       <svg width="22" height="18" viewBox="0 0 22 18" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false" role="none" class="twtr-color-fill--blue-logo"> 
-        <path fill-rule="evenodd" clip-rule="evenodd" d="M7.04128 17.7861C4.53883 17.7861 2.21078 17.0602 0.25 15.8165C0.596807 15.857 0.949401 15.8773 1.30683 15.8773C3.38266 15.8773 5.29282 15.1764 6.80944 14.0003C4.87 13.9646 3.23461 12.6968 2.67056 10.9547C2.94041 11.0059 3.21803 11.0338 3.50342 11.0338C3.90767 11.0338 4.2993 10.9798 4.67133 10.8796C2.64431 10.4775 1.11689 8.70468 1.11689 6.5808C1.11689 6.56156 1.11689 6.54327 1.11792 6.52489C1.71505 6.85368 2.39787 7.05133 3.12448 7.07347C1.93514 6.28783 1.15299 4.94488 1.15299 3.42361C1.15299 2.62053 1.37213 1.86754 1.75297 1.21971C3.93781 3.87277 7.20298 5.61776 10.885 5.80097C10.8091 5.47987 10.7701 5.14535 10.7701 4.80118C10.7701 2.38039 12.7543 0.416626 15.2012 0.416626C16.4753 0.416626 17.6267 0.949734 18.4351 1.80197C19.4444 1.60535 20.392 1.23997 21.2484 0.737722C20.9172 1.76154 20.2148 2.62053 19.3002 3.1633C20.1963 3.0572 21.0506 2.82194 21.8444 2.47297C21.2512 3.35223 20.4993 4.12445 19.6342 4.7433C19.643 4.93129 19.6469 5.12031 19.6469 5.31018C19.6469 11.1042 15.1905 17.7861 7.04128 17.7861Z" fill="#1DA1F2"></path> 
-       </svg>
-    </a>
-    <a href="https://www.linkedin.com/shareArticle?mini=true&url=https://parisneo.github.io/TodoList/&title=Here is a live Todolist app built with the help of chatgpt: TodoList" target="_blank">
-      <svg xmlns="http://www.w3.org/2000/svg" height="20" viewBox="0 0 72 72" width="72"><g fill="none" fill-rule="evenodd"><path d="M8,72 L64,72 C68.418278,72 72,68.418278 72,64 L72,8 C72,3.581722 68.418278,-8.11624501e-16 64,0 L8,0 C3.581722,8.11624501e-16 -5.41083001e-16,3.581722 0,8 L0,64 C5.41083001e-16,68.418278 3.581722,72 8,72 Z" fill="#007EBB"/><path d="M62,62 L51.315625,62 L51.315625,43.8021149 C51.315625,38.8127542 49.4197917,36.0245323 45.4707031,36.0245323 C41.1746094,36.0245323 38.9300781,38.9261103 38.9300781,43.8021149 L38.9300781,62 L28.6333333,62 L28.6333333,27.3333333 L38.9300781,27.3333333 L38.9300781,32.0029283 C38.9300781,32.0029283 42.0260417,26.2742151 49.3825521,26.2742151 C56.7356771,26.2742151 62,30.7644705 62,40.051212 L62,62 Z M16.349349,22.7940133 C12.8420573,22.7940133 10,19.9296567 10,16.3970067 C10,12.8643566 12.8420573,10 16.349349,10 C19.8566406,10 22.6970052,12.8643566 22.6970052,16.3970067 C22.6970052,19.9296567 19.8566406,22.7940133 16.349349,22.7940133 Z M11.0325521,62 L21.769401,62 L21.769401,27.3333333 L11.0325521,27.3333333 L11.0325521,62 Z" fill="#FFF"/></g></svg>
-   </a>    
-
-   <a href="https://www.facebook.com/sharer/sharer.php&u=https://parisneo.github.io/TodoList/&title=Here is a live Todolist app built with the help of chatgpt: TodoList" target="_blank">
-    <svg width="22" height="18" id="Layer_1" data-name="Layer 1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 287.56 191"><defs><style>.cls-1{fill:#0081fb;}.cls-2{fill:url(#linear-gradient);}.cls-3{fill:url(#linear-gradient-2);}</style><linearGradient id="linear-gradient" x1="62.34" y1="101.45" x2="260.34" y2="91.45" gradientTransform="matrix(1, 0, 0, -1, 0, 192)" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#0064e1"/><stop offset="0.4" stop-color="#0064e1"/><stop offset="0.83" stop-color="#0073ee"/><stop offset="1" stop-color="#0082fb"/></linearGradient><linearGradient id="linear-gradient-2" x1="41.42" y1="53" x2="41.42" y2="126" gradientTransform="matrix(1, 0, 0, -1, 0, 192)" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#0082fb"/><stop offset="1" stop-color="#0064e0"/></linearGradient></defs><title>facebook-meta</title><path class="cls-1" d="M31.06,126c0,11,2.41,19.41,5.56,24.51A19,19,0,0,0,53.19,160c8.1,0,15.51-2,29.79-21.76,11.44-15.83,24.92-38,34-52l15.36-23.6c10.67-16.39,23-34.61,37.18-47C181.07,5.6,193.54,0,206.09,0c21.07,0,41.14,12.21,56.5,35.11,16.81,25.08,25,56.67,25,89.27,0,19.38-3.82,33.62-10.32,44.87C271,180.13,258.72,191,238.13,191V160c17.63,0,22-16.2,22-34.74,0-26.42-6.16-55.74-19.73-76.69-9.63-14.86-22.11-23.94-35.84-23.94-14.85,0-26.8,11.2-40.23,31.17-7.14,10.61-14.47,23.54-22.7,38.13l-9.06,16c-18.2,32.27-22.81,39.62-31.91,51.75C84.74,183,71.12,191,53.19,191c-21.27,0-34.72-9.21-43-23.09C3.34,156.6,0,141.76,0,124.85Z"/><path class="cls-2" d="M24.49,37.3C38.73,15.35,59.28,0,82.85,0c13.65,0,27.22,4,41.39,15.61,15.5,12.65,32,33.48,52.63,67.81l7.39,12.32c17.84,29.72,28,45,33.93,52.22,7.64,9.26,13,12,19.94,12,17.63,0,22-16.2,22-34.74l27.4-.86c0,19.38-3.82,33.62-10.32,44.87C271,180.13,258.72,191,238.13,191c-12.8,0-24.14-2.78-36.68-14.61-9.64-9.08-20.91-25.21-29.58-39.71L146.08,93.6c-12.94-21.62-24.81-37.74-31.68-45C107,40.71,97.51,31.23,82.35,31.23c-12.27,0-22.69,8.61-31.41,21.78Z"/><path class="cls-3" d="M82.35,31.23c-12.27,0-22.69,8.61-31.41,21.78C38.61,71.62,31.06,99.34,31.06,126c0,11,2.41,19.41,5.56,24.51L10.14,167.91C3.34,156.6,0,141.76,0,124.85,0,94.1,8.44,62.05,24.49,37.3,38.73,15.35,59.28,0,82.85,0Z"/></svg>
-  </a>    
-
-</footer>
-  </div>
+        <!-- Add Item Form -->
+        <form id="add-item-form">
+            <input type="text" id="add-item-input" placeholder="Enter grocery item" autocomplete="off" required>
+             <!-- Suggestions will appear below this input -->
+            <ul id="suggestions-list" class="hidden"></ul>
+            <input type="text" id="item-quantity" placeholder="Qty (e.g., 1kg)">
+            <button id="audio-input-button" type="button" title="Record Item Name"><i class="fas fa-microphone"></i></button>
+            <button type="submit" id="submit-item-button" title="Add Item"><i class="fas fa-plus"></i> Add</button>
+        </form>
 
 
-  <script>
+        <!-- Controls: Sorting and Filtering -->
+        <div class="controls">
+             <div>
+                <label for="sort-by">Sort by:</label>
+                <select id="sort-by">
+                    <option value="default">Default (Added Order)</option>
+                    <option value="alpha-asc">Name (A-Z)</option>
+                    <option value="alpha-desc">Name (Z-A)</option>
+                    <option value="freq-desc">Frequency (Most First)</option>
+                    <option value="freq-asc">Frequency (Least First)</option>
+                    <option value="date-desc">Last Purchased (Newest)</option>
+                    <option value="date-asc">Last Purchased (Oldest)</option>
+                </select>
+            </div>
+             <div>
+                <label for="filter-by">Show:</label>
+                <select id="filter-by">
+                    <option value="all">All Items</option>
+                    <option value="active">Active Only</option>
+                    <option value="done">Completed Only</option>
+                </select>
+            </div>
+        </div>
 
+        <!-- Grocery List -->
+        <ul id="grocery-list">
+            <!-- Items will be rendered here by JavaScript -->
+        </ul>
+        <p id="empty-list-message">Your grocery list is empty. Add some items!</p>
 
-    const SpeechRecognition = window.SpeechRecognition || webkitSpeechRecognition;
-    const recognition = new SpeechRecognition();
-    recognition.continuous = true;
-    recognition.interimResults = true;
-    recognition.maxAlternatives = 10
-    let isStarted = false;
+        <!-- Settings Toggle -->
+        <button id="settings-toggle"><i class="fas fa-cog"></i> Show Settings</button>
 
-    const mic_button = document.querySelector("#audio_input_button");
-    const select = document.querySelector("#audio_input_language");
-    const input = document.querySelector("#add-todo-input");
-    
-    mic_button.addEventListener("click", () => {
-    if (isStarted) {
-      console.log("Stopping previous recognition")
-      recognition.stop();
-      isStarted = false;
-    } else {
-      console.log("Starting new recognition")
-      recognition.lang = select.value;
-      recognition.start();
-      isStarted = true;
-    }
-  });
-  
-  recognition.addEventListener("result", (event) => {
-      let transcript = "";
-      for (const result of event.results) {
-        transcript += result[0].transcript;
-      }
-      input.value = transcript;
-  });
+        <!-- Settings Area -->
+        <div id="settings">
+             <div class="settings-content">
+                 <div class="settings-row">
+                     <label for="audio_input_language">Speech:</label>
+                     <select id="audio_input_language">
+                         <option value="en-US">English</option>
+                         <option value="fr-FR">Français</option>
+                         <option value="es-ES">Español</option>
+                         <!-- Add other languages as needed -->
+                     </select>
+                 </div>
+                 <button id="generate-typical-list"><i class="fas fa-magic"></i> Generate Typical List</button>
+                <label class="button-like" for="import-items"><i class="fas fa-upload"></i> Import List (.json)</label>
+                <input type="file" id="import-items" accept=".json">
+                <button id="export-items"><i class="fas fa-download"></i> Export List (.json)</button>
+                <button id="clear-list" class="danger-button"><i class="fas fa-trash-alt"></i> Clear Current List</button>
+                <button id="clear-history" class="danger-button"><i class="fas fa-history"></i> Clear Purchase History</button>
+             </div>
+        </div>
 
-  
+        <!-- Footer -->
+        <footer>
+            Built with <i class="fas fa-heart" style="color: #e06c75;"></i> & AI Assistance |
+            <!-- Add your social links here if desired -->
+            <a href="#" target="_blank" title="Share on Twitter"> <i class="fab fa-twitter"></i></a>
+            <a href="#" target="_blank" title="Share on LinkedIn"><i class="fab fa-linkedin"></i></a>
+            <a href="#" target="_blank" title="Share on Facebook"><i class="fab fa-facebook"></i></a>
+        </footer>
+    </div>
 
+    <script>
+        // --- DOM Elements ---
+        const groceryApp = document.getElementById('grocery-app');
+        const addItemForm = document.getElementById('add-item-form');
+        const itemInput = document.getElementById('add-item-input');
+        const quantityInput = document.getElementById('item-quantity');
+        const suggestionsList = document.getElementById('suggestions-list');
+        const audioButton = document.getElementById('audio-input-button');
+        const audioLangSelect = document.getElementById('audio_input_language');
+        const groceryList = document.getElementById('grocery-list');
+        const emptyListMessage = document.getElementById('empty-list-message');
+        const sortSelect = document.getElementById('sort-by');
+        const filterSelect = document.getElementById('filter-by');
+        const settingsToggle = document.getElementById('settings-toggle');
+        const settingsDiv = document.getElementById('settings');
+        const generateTypicalButton = document.getElementById('generate-typical-list');
+        const importInput = document.getElementById('import-items');
+        const exportButton = document.getElementById('export-items');
+        const clearListButton = document.getElementById('clear-list');
+        const clearHistoryButton = document.getElementById('clear-history');
 
-    // Define an array to store the todo items
-    const todos = [];
+        // --- State ---
+        let currentItems = []; // Array for items currently in the list
+        let itemPurchaseHistory = {}; // Object to store { text: { count: N, lastPurchased: date } }
+        let isSpeechRecognitionActive = false;
+        let draggedItem = null; // Track the item being dragged
 
-    // Define a reference to the add todo form and the todo list
-    const addTodoForm = document.querySelector('#add-todo-form');
-    const todoList = document.querySelector('#todo-list');
-    // Define a reference to the clear todo list button
-    const clearTodoListButton = document.querySelector('#clear-todo-list');
+        // --- Speech Recognition Setup ---
+        const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+        let recognition;
+        if (SpeechRecognition) {
+            recognition = new SpeechRecognition();
+            recognition.continuous = false; // Stop after first utterance for simplicity
+            recognition.interimResults = false; // Get final result
+            recognition.maxAlternatives = 1;
 
-    // Attach an event listener that listens for the 'click' event
-    clearTodoListButton.addEventListener('click', event => {
-      // Clear the todo list
-      todos.splice(0, todos.length);
-      localStorage.removeItem('todos');
+            recognition.onstart = () => {
+                isSpeechRecognitionActive = true;
+                audioButton.classList.add('recording');
+                audioButton.title = "Stop Recording";
+            };
 
-      // Remove all the todo items from the UI
-      while (todoList.firstChild) {
-        todoList.removeChild(todoList.firstChild);
-      }
-    });
+            recognition.onresult = (event) => {
+                const transcript = event.results[0][0].transcript;
+                itemInput.value = transcript; // Populate the item input
+                itemInput.focus(); // Optionally focus quantity next
+            };
 
-    // Attach an event listener that listens for the 'submit' event on the form
-    addTodoForm.addEventListener('submit', event => {
-      // Prevent the default form submission behavior
-      event.preventDefault();
-      console.log(addTodoForm.elements)
-      // Retrieve the value of the 'text' input field from the form
-      todo_input = document.querySelector('#add-todo-input');
-      const text = todo_input.value;
-      todo_input.value = "";
-      // Add the new todo item to the list
-      addTodo(text);
-    });
-    function renderTodos(){
-      // Retrieve the todos array from the local database
-      const savedTodos = JSON.parse(localStorage.getItem('todos'));
-      console.log(savedTodos)
-      while (todoList.firstChild) {
-        todoList.removeChild(todoList.firstChild);
-      }
+            recognition.onerror = (event) => {
+                console.error('Speech recognition error:', event.error);
+                alert(`Speech recognition error: ${event.error}`);
+            };
 
-      // Iterate over the todos array and add each item to the list
-      if (savedTodos) {
-        for (const todo of savedTodos) {
-          addTodo(todo.text, todo.done);
-        }
-      }
+            recognition.onend = () => {
+                isSpeechRecognitionActive = false;
+                audioButton.classList.remove('recording');
+                 audioButton.title = "Record Item Name";
+            };
 
-    }
-
-    // Define a function to add a new todo item
-    function addTodo(text, done=false) {
-      const id = todos.length; // Use the length of the todos array as the todo item's id
-      const todo = {
-        id: id, // Use the current timestamp as the todo item's id
-        text: text,     // The todo item's text
-        done: done     // Initially, the todo item is not done
-      };
-
-      todos.push(todo); // Add the new todo item to the array
-
-      // Save the updated todos array to the local database
-      localStorage.setItem('todos', JSON.stringify(todos));
-
-      // Create a new list item to display the todo item
-      const todoItem = document.createElement('li');
-
-      // Create a checkbox for the todo item
-      /* const checkbox = document.createElement('input');
-      checkbox.type = 'checkbox';
-      checkbox.checked = todo.done;
-      todoItem.appendChild(checkbox); */
-
-      // Update the background color of the todo item to dark gray
-      todoItem.style.backgroundColor = todo.done ? '#006400' : '#333';
-      todoItem.draggable="true";
-      // Create a label for the todo item
-      const label = document.createElement('label');
-      label.innerText = todo.text;
-
-      // Add an event listener that listens for the 'click' event on the label
-      label.addEventListener('click', event => {
-        // Remove the label from the todo item
-        todoItem.removeChild(label);
-
-        // Create an input element for the todo item
-        const input = document.createElement('input');
-        input.type = 'text';
-        input.value = todo.text;
-        // Add an event listener that listens for the 'blur' event on the input element
-        input.addEventListener('blur', event => {
-            // Update the todo item's text
-            todo.text = input.value;
-
-            // Save the updated todos array to the local database
-            localStorage.setItem('todos', JSON.stringify(todos));
-            // Replace the input element with the label
-            todoItem.replaceChild(label, input);
-            label.innerText = todo.text;
-        });
-        input.addEventListener('keydown', event => {
-          if (event.keyCode === 13) { // Listen for the 'Enter' key
-            // Update the todo item's text
-            todo.text = input.value;
-
-            // Save the updated todos array to the local database
-            localStorage.setItem('todos', JSON.stringify(todos));
-            // Replace the input element with the label
-            todoItem.replaceChild(label, input);
-            label.innerText = todo.text;
-          }
-        });
-
-        // Add the input element to the todo item
-        todoItem.insertBefore(input, markAsDoneButton);
-        input.focus(); // Focus on the input element
-      });
-
-      todoItem.appendChild(label);
-
-      // Create a "Mark as Done" button for the todo item
-      const markAsDoneButton = document.createElement('button');
-      markAsDoneButton.innerText = todo.done?'Mark as Not Done':'Mark as Done';
-      markAsDoneButton.classList.add('mark-as-done-button'); // Add the 'mark-as-done-button' class
-      markAsDoneButton.addEventListener('click', event => {
-        // Mark the todo item as done or undone
-        todo.done = !todo.done;
-        markAsDoneButton.innerText = todo.done?'Mark as Not Done':'Mark as Done';
-        // Save the updated todos array to the local database
-        localStorage.setItem('todos', JSON.stringify(todos));
-        if (todo.done) {
-          todoList.appendChild(todoItem);
+            audioButton.addEventListener('click', () => {
+                if (!SpeechRecognition) {
+                    alert("Sorry, your browser doesn't support Speech Recognition.");
+                    return;
+                }
+                if (isSpeechRecognitionActive) {
+                    recognition.stop();
+                } else {
+                    try {
+                        recognition.lang = audioLangSelect.value;
+                        recognition.start();
+                    } catch (e) {
+                         console.error("Could not start recognition (maybe already active?):", e);
+                         // Reset state just in case
+                         isSpeechRecognitionActive = false;
+                         audioButton.classList.remove('recording');
+                         audioButton.title = "Record Item Name";
+                    }
+                }
+            });
         } else {
-          todoList.prepend(todoItem);
+            audioButton.disabled = true;
+            audioButton.title = "Speech Recognition not supported";
+            console.warn("Speech Recognition API not supported in this browser.");
         }
 
-        // Update the UI to reflect the todo item's new state
-        // checkbox.checked = true;
-        todoItem.style.backgroundColor = todo.done ? '#006400' : '#333';
-        // Check if all todo items are marked as done
-        let allDone = true;
-        for (let todo of todos) {
-          if (!todo.done) {
-            allDone = false;
-            break;
-          }
+
+        // --- Utility Functions ---
+        const generateId = () => `item-${Date.now()}-${Math.random().toString(16).slice(2)}`;
+        const sanitizeText = (text) => text.trim(); // Basic sanitization
+
+        // --- Local Storage Functions ---
+        const saveState = () => {
+            try {
+                localStorage.setItem('groceryListItems', JSON.stringify(currentItems));
+                localStorage.setItem('groceryItemHistory', JSON.stringify(itemPurchaseHistory));
+            } catch (e) {
+                console.error("Error saving state to localStorage:", e);
+                alert("Could not save data. LocalStorage might be full or disabled.");
+            }
+        };
+
+        const loadState = () => {
+            try {
+                const storedItems = localStorage.getItem('groceryListItems');
+                const storedHistory = localStorage.getItem('groceryItemHistory');
+                currentItems = storedItems ? JSON.parse(storedItems) : [];
+                itemPurchaseHistory = storedHistory ? JSON.parse(storedHistory) : {};
+                // Data migration / validation could happen here if structure changes
+            } catch (e) {
+                console.error("Error loading state from localStorage:", e);
+                alert("Could not load previous data. Starting fresh.");
+                currentItems = [];
+                itemPurchaseHistory = {};
+            }
+        };
+
+        // --- History Management ---
+        const updateHistory = (itemText, isPurchase) => {
+             const text = sanitizeText(itemText).toLowerCase(); // Use lowercase for consistent keys
+             if (!text) return;
+
+             if (!itemPurchaseHistory[text]) {
+                 itemPurchaseHistory[text] = { count: 0, lastPurchased: null };
+             }
+             if (isPurchase) {
+                 itemPurchaseHistory[text].count += 1;
+                 itemPurchaseHistory[text].lastPurchased = new Date().toISOString();
+             }
+             // Note: We don't decrement count on un-checking, history tracks total purchases.
+        };
+
+
+        // --- Rendering Functions ---
+        const renderItems = () => {
+            groceryList.innerHTML = ''; // Clear previous items
+
+             // 1. Filter
+             let itemsToRender = filterItems(currentItems);
+             // 2. Sort
+             itemsToRender = sortItems(itemsToRender);
+
+            if (itemsToRender.length === 0) {
+                emptyListMessage.classList.add('visible');
+                groceryList.style.display = 'none'; // Hide the ul itself
+            } else {
+                emptyListMessage.classList.remove('visible');
+                groceryList.style.display = 'block'; // Show the ul
+                itemsToRender.forEach(item => groceryList.appendChild(createItemElement(item)));
+            }
+
+            updateDragAndDropListeners(); // Re-attach listeners after render
+            saveState(); // Save state after every render
+        };
+
+        const filterItems = (items) => {
+            const filterValue = filterSelect.value;
+            switch(filterValue) {
+                case 'active': return items.filter(item => !item.done);
+                case 'done': return items.filter(item => item.done);
+                case 'all':
+                default: return [...items]; // Return a copy
+            }
+        };
+
+        const sortItems = (items) => {
+             const sortValue = sortSelect.value;
+             const sortedItems = [...items]; // Create a copy to sort
+
+             const getItemHistory = (itemText) => itemPurchaseHistory[sanitizeText(itemText).toLowerCase()] || { count: 0, lastPurchased: null };
+
+             sortedItems.sort((a, b) => {
+                 const historyA = getItemHistory(a.text);
+                 const historyB = getItemHistory(b.text);
+                 const textA = sanitizeText(a.text).toLowerCase();
+                 const textB = sanitizeText(b.text).toLowerCase();
+
+                 // Primary sort: Done items always at the bottom unless filtering specifically for them
+                 if (filterSelect.value !== 'done') {
+                    if (a.done && !b.done) return 1;
+                    if (!a.done && b.done) return -1;
+                 }
+
+                 // Secondary sort based on selection
+                 switch (sortValue) {
+                    case 'alpha-asc': return textA.localeCompare(textB);
+                    case 'alpha-desc': return textB.localeCompare(textA);
+                    case 'freq-desc': return (historyB.count) - (historyA.count);
+                    case 'freq-asc': return (historyA.count) - (historyB.count);
+                    case 'date-desc':
+                        // Handle null dates (items never purchased)
+                        if (!historyA.lastPurchased && !historyB.lastPurchased) return 0;
+                        if (!historyA.lastPurchased) return 1; // Put items never purchased last
+                        if (!historyB.lastPurchased) return -1;
+                        return new Date(historyB.lastPurchased) - new Date(historyA.lastPurchased);
+                    case 'date-asc':
+                         if (!historyA.lastPurchased && !historyB.lastPurchased) return 0;
+                         if (!historyA.lastPurchased) return -1; // Put items never purchased first
+                         if (!historyB.lastPurchased) return 1;
+                        return new Date(historyA.lastPurchased) - new Date(historyB.lastPurchased);
+                     case 'default':
+                     default:
+                        // Maintain original relative order within done/not done groups
+                        // This requires knowing the original index, which simple sort doesn't provide easily.
+                        // For 'default', we might skip the secondary sort or use the ID if it relates to creation time.
+                        // Assuming IDs are time-based:
+                        const idA = parseInt(a.id.split('-')[1] || 0);
+                        const idB = parseInt(b.id.split('-')[1] || 0);
+                        return idA - idB;
+                 }
+             });
+             return sortedItems;
+        };
+
+        const createItemElement = (item) => {
+            const li = document.createElement('li');
+            li.dataset.id = item.id;
+            li.draggable = true;
+            if (item.done) {
+                li.classList.add('done');
+            }
+
+            // Checkbox
+            const checkbox = document.createElement('input');
+            checkbox.type = 'checkbox';
+            checkbox.checked = item.done;
+            checkbox.classList.add('item-checkbox');
+            checkbox.addEventListener('change', () => toggleDone(item.id));
+            li.appendChild(checkbox);
+
+            // Item Details (Text + Quantity) or Edit Inputs
+            const detailsDiv = document.createElement('div');
+            detailsDiv.classList.add('item-details');
+            li.appendChild(detailsDiv);
+
+            if (item.isEditing) {
+                 const textInput = document.createElement('input');
+                 textInput.type = 'text';
+                 textInput.value = item.text;
+                 textInput.classList.add('edit-item-text');
+                 detailsDiv.appendChild(textInput);
+
+                 const quantInput = document.createElement('input');
+                 quantInput.type = 'text';
+                 quantInput.value = item.quantity;
+                 quantInput.placeholder = "Qty";
+                 quantInput.classList.add('edit-item-quantity');
+                 detailsDiv.appendChild(quantInput);
+
+                 // Focus the text input when editing starts
+                 setTimeout(() => textInput.focus(), 0);
+
+            } else {
+                const textSpan = document.createElement('span');
+                textSpan.textContent = item.text;
+                textSpan.classList.add('item-text');
+                detailsDiv.appendChild(textSpan);
+
+                if (item.quantity) {
+                    const quantSpan = document.createElement('span');
+                    quantSpan.textContent = item.quantity;
+                    quantSpan.classList.add('item-quantity-display');
+                    detailsDiv.appendChild(quantSpan);
+                }
+            }
+
+
+            // Action Buttons
+            const actionsDiv = document.createElement('div');
+            actionsDiv.classList.add('item-actions');
+            li.appendChild(actionsDiv);
+
+            if (item.isEditing) {
+                 const saveButton = document.createElement('button');
+                 saveButton.innerHTML = '<i class="fas fa-save"></i>';
+                 saveButton.title = "Save Changes";
+                 saveButton.classList.add('save-button');
+                 saveButton.addEventListener('click', (e) => {
+                     e.stopPropagation(); // Prevent triggering drag/drop
+                     const newText = li.querySelector('.edit-item-text').value;
+                     const newQuantity = li.querySelector('.edit-item-quantity').value;
+                     saveEdit(item.id, newText, newQuantity);
+                 });
+                 actionsDiv.appendChild(saveButton);
+
+                 const cancelButton = document.createElement('button');
+                 cancelButton.innerHTML = '<i class="fas fa-times"></i>';
+                 cancelButton.title = "Cancel Edit";
+                 cancelButton.classList.add('cancel-button', 'danger-button');
+                 cancelButton.addEventListener('click', (e) => {
+                     e.stopPropagation();
+                     cancelEdit(item.id);
+                 });
+                 actionsDiv.appendChild(cancelButton);
+
+                 // Allow saving with Enter key
+                 li.querySelectorAll('input[type="text"]').forEach(input => {
+                    input.addEventListener('keydown', (e) => {
+                        if (e.key === 'Enter') {
+                            saveButton.click();
+                        } else if (e.key === 'Escape') {
+                            cancelButton.click();
+                        }
+                    });
+                 });
+
+            } else {
+                const editButton = document.createElement('button');
+                editButton.innerHTML = '<i class="fas fa-pencil-alt"></i>';
+                editButton.title = "Edit Item";
+                editButton.classList.add('edit-button');
+                editButton.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    startEdit(item.id);
+                });
+                actionsDiv.appendChild(editButton);
+
+                const removeButton = document.createElement('button');
+                removeButton.innerHTML = '<i class="fas fa-trash-alt"></i>';
+                removeButton.title = "Remove Item";
+                removeButton.classList.add('remove-button');
+                removeButton.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    removeItem(item.id);
+                });
+                actionsDiv.appendChild(removeButton);
+            }
+
+
+            return li;
+        };
+
+        // --- Item CRUD Functions ---
+        const addItem = (text, quantity) => {
+            const cleanText = sanitizeText(text);
+            if (!cleanText) {
+                alert("Please enter an item name.");
+                return; // Don't add empty items
+            }
+
+            // Prevent adding exact duplicates (optional, based on preference)
+             const exists = currentItems.some(item => sanitizeText(item.text).toLowerCase() === cleanText.toLowerCase() && !item.done);
+             if (exists) {
+                 alert(`${cleanText} is already on the active list.`);
+                 return;
+             }
+
+
+            const newItem = {
+                id: generateId(),
+                text: cleanText,
+                quantity: sanitizeText(quantity),
+                done: false,
+                isEditing: false // Add editing flag
+                // purchaseCount and lastPurchased are managed in itemPurchaseHistory
+            };
+            currentItems.unshift(newItem); // Add to the top
+            updateHistory(cleanText, false); // Add to history if new, don't mark as purchased yet
+            renderItems();
+        };
+
+        const removeItem = (id) => {
+            const itemIndex = currentItems.findIndex(item => item.id === id);
+            if (itemIndex > -1) {
+                 // Optionally confirm deletion
+                 // if (!confirm(`Are you sure you want to remove "${currentItems[itemIndex].text}"?`)) {
+                 //     return;
+                 // }
+                currentItems.splice(itemIndex, 1);
+                renderItems(); // Re-render which also saves state
+            }
+        };
+
+        const toggleDone = (id) => {
+            const itemIndex = currentItems.findIndex(item => item.id === id);
+            if (itemIndex > -1) {
+                const item = currentItems[itemIndex];
+                const previousDoneState = item.done;
+                item.done = !item.done;
+
+                // Only update history count when marking as DONE
+                if (item.done && !previousDoneState) {
+                     updateHistory(item.text, true); // Mark as purchased
+                }
+                // Fix: Ensure no duplication by just modifying the state and re-rendering
+                renderItems();
+            }
+        };
+
+         const startEdit = (id) => {
+            currentItems = currentItems.map(item => ({
+                ...item,
+                isEditing: item.id === id // Set editing true only for the target item
+            }));
+            renderItems();
+        };
+
+        const saveEdit = (id, newText, newQuantity) => {
+            const cleanText = sanitizeText(newText);
+             if (!cleanText) {
+                 alert("Item name cannot be empty.");
+                 return;
+             }
+            currentItems = currentItems.map(item => {
+                if (item.id === id) {
+                     // If text changes, we might need to update history linkage,
+                     // but typically history is based on the original addition.
+                     // Let's keep it simple: editing modifies the current instance.
+                    return { ...item, text: cleanText, quantity: sanitizeText(newQuantity), isEditing: false };
+                }
+                return item;
+            });
+            renderItems();
+        };
+
+         const cancelEdit = (id) => {
+             currentItems = currentItems.map(item => item.id === id ? { ...item, isEditing: false } : item);
+             renderItems();
+         };
+
+
+        // --- Feature Functions ---
+
+        const showSuggestions = (query) => {
+             suggestionsList.innerHTML = '';
+             if (!query) {
+                 suggestionsList.classList.add('hidden');
+                 return;
+             }
+
+             const lowerQuery = query.toLowerCase();
+             const historyEntries = Object.entries(itemPurchaseHistory);
+
+             // Sort suggestions by purchase count (descending)
+             const sortedHistory = historyEntries.sort(([, histA], [, histB]) => histB.count - histA.count);
+
+             const matchingSuggestions = sortedHistory
+                 .filter(([text]) => text.toLowerCase().includes(lowerQuery))
+                 .slice(0, 5); // Limit to top 5 suggestions
+
+             if (matchingSuggestions.length > 0) {
+                 matchingSuggestions.forEach(([text]) => {
+                     const li = document.createElement('li');
+                     li.textContent = text; // Display the original case potentially stored
+                      // Capitalize first letter for display
+                     li.textContent = text.charAt(0).toUpperCase() + text.slice(1);
+                     li.addEventListener('click', () => {
+                         itemInput.value = li.textContent; // Use the clicked text
+                         suggestionsList.classList.add('hidden');
+                         suggestionsList.innerHTML = '';
+                         quantityInput.focus(); // Move focus to quantity
+                     });
+                     suggestionsList.appendChild(li);
+                 });
+                 suggestionsList.classList.remove('hidden');
+             } else {
+                 suggestionsList.classList.add('hidden');
+             }
+        };
+
+        const generateTypicalList = () => {
+            const threshold = 2; // Minimum purchase count to be considered "typical"
+            const maxItems = 15; // Max number of items to add
+
+             const typicalItems = Object.entries(itemPurchaseHistory)
+                .filter(([, hist]) => hist.count >= threshold)
+                .sort(([, histA], [, histB]) => histB.count - histA.count) // Most frequent first
+                .slice(0, maxItems)
+                .map(([text]) => text); // Get just the item names
+
+             if (typicalItems.length === 0) {
+                 alert("Not enough purchase history to generate a typical list. Keep using the app!");
+                 return;
+             }
+
+             let addedCount = 0;
+             typicalItems.forEach(text => {
+                 // Check if it's already on the *active* list
+                 const alreadyActive = currentItems.some(item =>
+                     !item.done && sanitizeText(item.text).toLowerCase() === text.toLowerCase()
+                 );
+                 if (!alreadyActive) {
+                     // Find original case if possible, otherwise use history key
+                     const originalCaseText = Object.keys(itemPurchaseHistory).find(k => k.toLowerCase() === text) || text;
+                     addItem(originalCaseText.charAt(0).toUpperCase() + originalCaseText.slice(1), ''); // Add with empty quantity
+                     addedCount++;
+                 }
+             });
+
+             if (addedCount > 0) {
+                alert(`Added ${addedCount} typical items to your list.`);
+             } else {
+                 alert("Your current list already contains most of your typical items.");
+             }
+             renderItems(); // Render the updated list
+        };
+
+        const exportData = () => {
+            try {
+                const dataToExport = {
+                    currentList: currentItems.map(({ isEditing, ...item }) => item), // Exclude transient editing state
+                    purchaseHistory: itemPurchaseHistory
+                };
+                const dataStr = JSON.stringify(dataToExport, null, 2); // Pretty print JSON
+                const dataBlob = new Blob([dataStr], { type: 'application/json' });
+                const url = URL.createObjectURL(dataBlob);
+                const link = document.createElement('a');
+                link.download = `grocery_list_backup_${new Date().toISOString().slice(0,10)}.json`;
+                link.href = url;
+                link.click();
+                URL.revokeObjectURL(url);
+                 alert("Data exported successfully!");
+            } catch (e) {
+                console.error("Export failed:", e);
+                alert("Failed to export data.");
+            }
+        };
+
+        const importData = (event) => {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                try {
+                    const importedData = JSON.parse(e.target.result);
+                    if (importedData && typeof importedData === 'object') {
+                        // Basic validation
+                        const hasList = Array.isArray(importedData.currentList);
+                        const hasHistory = typeof importedData.purchaseHistory === 'object';
+
+                        if (!confirm("This will replace your current list and history. Are you sure?")) {
+                           importInput.value = ''; // Clear the file input
+                           return;
+                        }
+
+                        currentItems = hasList ? importedData.currentList.map(item => ({...item, isEditing: false })) : []; // Ensure no editing state
+                        itemPurchaseHistory = hasHistory ? importedData.purchaseHistory : {};
+
+                        // Maybe add more robust validation here later
+
+                        renderItems(); // Render the newly imported data
+                        alert("Data imported successfully!");
+                    } else {
+                        throw new Error("Invalid file format.");
+                    }
+                } catch (error) {
+                    console.error("Import failed:", error);
+                    alert(`Failed to import data: ${error.message}`);
+                } finally {
+                     importInput.value = ''; // Clear the file input regardless of success/failure
+                }
+            };
+            reader.onerror = () => {
+                alert("Failed to read the file.");
+                 importInput.value = '';
+            };
+            reader.readAsText(file);
+        };
+
+        const clearCurrentList = () => {
+            if (currentItems.length > 0 && confirm("Are you sure you want to clear all items from the current list?")) {
+                currentItems = [];
+                renderItems();
+            } else if (currentItems.length === 0) {
+                alert("List is already empty.");
+            }
+        };
+
+        const clearHistory = () => {
+             if (Object.keys(itemPurchaseHistory).length > 0 && confirm("WARNING: This will permanently delete all purchase history and suggestions data. Are you sure?")) {
+                itemPurchaseHistory = {};
+                renderItems(); // Save the empty history
+             } else if (Object.keys(itemPurchaseHistory).length === 0) {
+                 alert("Purchase history is already empty.");
+             }
+        };
+
+        // --- Drag and Drop ---
+        let dragOverElement = null; // Track element being dragged over
+
+        function handleDragStart(e) {
+            draggedItem = e.target;
+            e.dataTransfer.effectAllowed = 'move';
+            e.dataTransfer.setData('text/plain', draggedItem.dataset.id); // Use ID
+            // Add styling asynchronously to ensure it applies after drag starts
+            setTimeout(() => draggedItem.classList.add('dragging'), 0);
         }
 
-        // Show a popup if all todo items are done
-        if (allDone) {
-          alert('All items are done!');
-        }        
-      });
-      todoItem.appendChild(markAsDoneButton);
-
-      // Create a "Remove" button for the todo item
-      const removeButton = document.createElement('button');
-      removeButton.innerText = 'Remove';
-      removeButton.addEventListener('click', event => {
-        // Define the id variable and set it to the id property of the todo object
-        const id = todo.id;        
-        // Remove the todo item from the array
-        const todoIndex = todos.findIndex(todo => todo.id === id);
-        if (todoIndex !== -1) {
-          todos.splice(todoIndex, 1);
-
-          // Save the updated todos array to the local database
-          localStorage.setItem('todos', JSON.stringify(todos));
-
-          // Remove the todo item from the UI
-          todoList.removeChild(todoItem);
+        function handleDragEnd(e) {
+            if (draggedItem) {
+                draggedItem.classList.remove('dragging');
+            }
+             // Clean up any lingering drag-over styles
+            if(dragOverElement) {
+                dragOverElement.classList.remove('drag-over');
+            }
+            draggedItem = null;
+            dragOverElement = null;
         }
-      });
-      todoItem.appendChild(removeButton);
 
+        function handleDragOver(e) {
+             e.preventDefault(); // Necessary to allow dropping
+             e.dataTransfer.dropEffect = 'move';
 
-      // DRAG and DROP
-
-      // Attach an event listener that listens for the 'dragstart' event on the todo item
-      todoItem.addEventListener('dragstart', event => {
-        // Set the data that will be transferred when the item is dragged
-        event.dataTransfer.setData('id', todo.id);
-      });
-
-      // Attach an event listener that listens for the 'dragover' event on the todo list
-      todoList.addEventListener('dragover', event => {
-        // Prevent the default behavior (prevent the data from being opened as a link, for example)
-        event.preventDefault();
-      });
-
-      // Define a function to move a todo item to the current position
-      function moveTodo(id, target) {
-        // Find the todo item by id
-        const todo = todos.find(todo => todo.id === id);
-
-        // If the todo item was found
-        if (todo) {
-          // Remove the todo item from its original position
-          const index = todos.indexOf(todo);
-          todos.splice(index, 1);
-
-          // Insert the todo item at the current position
-          const targetIndex = Array.prototype.indexOf.call(target.parentNode.children, target);
-          todos.splice(targetIndex, 0, todo);
-
-          // Save the updated todos array to the local database
-          //localStorage.setItem('todos', JSON.stringify(todos));
+             const target = e.target.closest('li'); // Find the nearest parent `li`
+             if (target && target !== draggedItem && target !== dragOverElement) {
+                  // Remove class from previous target
+                  if(dragOverElement) {
+                      dragOverElement.classList.remove('drag-over');
+                  }
+                  // Add class to new target
+                  target.classList.add('drag-over');
+                  dragOverElement = target;
+             }
         }
-      }
 
-      // Attach an event listener that listens for the 'drop' event on the todo list
-      todoList.addEventListener('drop', event => {
-        // Get the data that was dropped
-        const id = event.dataTransfer.getData('id');
-        const index = id// todos.findIndex(todo => todo.id === id);
-        // Get the target element (the element the data was dropped on)
-        const target = event.target;
-        console.log("moving")
-        //moveTodo(id, target)
-        // Prevent default behavior (prevent the data from being opened as a link, for example)
-        event.preventDefault();
-
-        renderTodos();
-      });
+        function handleDragLeave(e) {
+            const target = e.target.closest('li');
+             if(target && target === dragOverElement) {
+                 target.classList.remove('drag-over');
+                 dragOverElement = null;
+             }
+        }
 
 
+        function handleDrop(e) {
+            e.preventDefault();
+            if (dragOverElement && draggedItem && dragOverElement !== draggedItem) {
+                 dragOverElement.classList.remove('drag-over');
 
-      // Add the new todo item to the UI
-      //todoList.appendChild(todoItem);
-      if (done) {
-        todoList.appendChild(todoItem);
-      } else {
-        todoList.prepend(todoItem);
-      }
+                 const draggedId = e.dataTransfer.getData('text/plain');
+                 const targetId = dragOverElement.dataset.id;
 
-    }
+                 const draggedIndex = currentItems.findIndex(item => item.id === draggedId);
+                 const targetIndex = currentItems.findIndex(item => item.id === targetId);
 
-    function exportTodos() {
-      // Retrieve the todos array from the local database
-      const todos = JSON.parse(localStorage.getItem('todos'));
+                 if (draggedIndex !== -1 && targetIndex !== -1) {
+                     // Remove dragged item from original position
+                     const [movedItem] = currentItems.splice(draggedIndex, 1);
+                     // Insert dragged item at the target position
+                     // Adjust index because splice changes array length
+                     const newTargetIndex = currentItems.findIndex(item => item.id === targetId);
+                     currentItems.splice(newTargetIndex, 0, movedItem);
 
-      // Convert the todos array to a JSON string
-      const todosJson = JSON.stringify(todos);
+                     renderItems(); // Re-render the list with new order
+                 }
+            }
+             // Ensure dragging class is removed even if drop wasn't on a valid target
+             if (draggedItem) {
+                 draggedItem.classList.remove('dragging');
+             }
+             draggedItem = null;
+             dragOverElement = null;
+        }
 
-      // Create a new Blob object with the JSON string
-      const todosBlob = new Blob([todosJson], { type: 'application/json' });
+        // Need to re-attach drag listeners each time list is rendered
+        function updateDragAndDropListeners() {
+            const items = groceryList.querySelectorAll('li');
+            items.forEach(item => {
+                item.addEventListener('dragstart', handleDragStart);
+                item.addEventListener('dragend', handleDragEnd);
+                item.addEventListener('dragover', handleDragOver);
+                 item.addEventListener('dragleave', handleDragLeave);
+                item.addEventListener('drop', handleDrop);
 
-      // Create a new <a> element with the download attribute
-      const downloadLink = document.createElement('a');
-      downloadLink.download = 'todos.json';
-      downloadLink.href = URL.createObjectURL(todosBlob);
+                // Basic Touch Event Simulation for Reordering
+                // Note: This is a simplified version. Robust touch drag/drop is complex.
+                let touchStartY = 0;
+                let currentTouchY = 0;
+                let touchDraggedItem = null;
 
-      // Trigger a click event on the <a> element
-      downloadLink.click();
+                item.addEventListener('touchstart', (e) => {
+                    // Only initiate drag if touching the item itself, not buttons/checkbox
+                     if (e.target.closest('button') || e.target.closest('input')) {
+                         return;
+                     }
+                     touchDraggedItem = e.currentTarget; // The LI element
+                     touchStartY = e.touches[0].clientY;
+                     touchDraggedItem.style.opacity = '0.5'; // Visual feedback
+                     touchDraggedItem.style.zIndex = '1000'; // Bring to front
+                     // Prevent page scroll while dragging item
+                     // document.body.style.overflow = 'hidden'; // Might be too aggressive
+                }, { passive: true }); // Use passive for performance if not preventing default scroll always
 
-      // Revoke the object URL
-      URL.revokeObjectURL(downloadLink.href);
-      console.log("cool")
-    }
+                item.addEventListener('touchmove', (e) => {
+                    if (!touchDraggedItem) return;
+                     //e.preventDefault(); // Prevent scroll ONLY when actively dragging an item
+                    currentTouchY = e.touches[0].clientY;
+                    const diffY = currentTouchY - touchStartY;
+                    touchDraggedItem.style.transform = `translateY(${diffY}px)`;
 
-    function loadTodos() {
-      // Create a new FileReader object
-      const reader = new FileReader();
+                    // Basic Drop Target Highlighting (more complex logic needed for accuracy)
+                     // Find element under the finger
+                    const elementUnderTouch = document.elementFromPoint(e.touches[0].clientX, e.touches[0].clientY);
+                    const potentialTarget = elementUnderTouch ? elementUnderTouch.closest('li') : null;
+                     if (potentialTarget && potentialTarget !== touchDraggedItem && potentialTarget !== dragOverElement) {
+                         if(dragOverElement) dragOverElement.classList.remove('drag-over');
+                         potentialTarget.classList.add('drag-over');
+                         dragOverElement = potentialTarget;
+                     } else if (!potentialTarget && dragOverElement) {
+                          dragOverElement.classList.remove('drag-over');
+                          dragOverElement = null;
+                     }
 
-      // Set the onload event handler for the FileReader object
-      reader.onload = event => {
-        // Convert the JSON file to an array using JSON.parse()
-        const todos = JSON.parse(event.target.result);
-        console.log(todos)
+                }, { passive: false }); // Need false to potentially prevent default scroll
 
-        // Render the todo list
-        localStorage.setItem('todos', JSON.stringify(todos));
-        renderTodos();
-      };
+                item.addEventListener('touchend', (e) => {
+                    if (!touchDraggedItem) return;
 
-      // Read the contents of the selected file
-      reader.readAsText(event.target.files[0]);
-    }
-    
+                    // Reset styles
+                    touchDraggedItem.style.opacity = '1';
+                    touchDraggedItem.style.transform = 'translateY(0px)';
+                    touchDraggedItem.style.zIndex = 'auto';
+                    //document.body.style.overflow = 'auto'; // Restore scrolling
 
-    // Attach an event listener that listens for the 'load' event
-    window.addEventListener('load', event => {
-      renderTodos();
-    });
-    const div = document.querySelector('#todo-app > div');
-    const button = document.querySelector('#show-div-button');
-    div.style.height = '0'; // Hide the div element
-    button.addEventListener('click', event => {
-      if (div.style.height === '0px') {
-        button.innerHTML = "Hide settings";
-        div.style.height = 'auto';
-      } else {
-        button.innerHTML = "Show settings";
-        div.style.height = 0;
-      }
-    });
+                     // Find the final element under the touch point or last known target
+                    const finalTarget = dragOverElement; // Use the last element hovered over
 
-</script>
+                    if (finalTarget && finalTarget !== touchDraggedItem) {
+                        finalTarget.classList.remove('drag-over');
+                         const draggedId = touchDraggedItem.dataset.id;
+                         const targetId = finalTarget.dataset.id;
+
+                         const draggedIndex = currentItems.findIndex(item => item.id === draggedId);
+                         const targetIndex = currentItems.findIndex(item => item.id === targetId);
+
+                         if (draggedIndex !== -1 && targetIndex !== -1) {
+                            const [movedItem] = currentItems.splice(draggedIndex, 1);
+                            const newTargetIndex = currentItems.findIndex(item => item.id === targetId);
+                            currentItems.splice(newTargetIndex, 0, movedItem);
+                            renderItems();
+                         }
+                    } else if (dragOverElement) {
+                        // Clean up if dropped outside a valid target but over was triggered
+                         dragOverElement.classList.remove('drag-over');
+                    }
+
+                    touchDraggedItem = null;
+                    dragOverElement = null; // Reset drop target tracking
+                });
+            });
+        }
+
+
+        // --- Event Listeners ---
+        addItemForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            addItem(itemInput.value, quantityInput.value);
+            itemInput.value = '';
+            quantityInput.value = '';
+            itemInput.focus();
+            suggestionsList.classList.add('hidden'); // Hide suggestions on submit
+        });
+
+        itemInput.addEventListener('input', () => {
+            showSuggestions(itemInput.value);
+        });
+
+        // Hide suggestions if clicking outside the input/list
+         document.addEventListener('click', (e) => {
+             if (!addItemForm.contains(e.target)) {
+                 suggestionsList.classList.add('hidden');
+             }
+         });
+
+
+        sortSelect.addEventListener('change', renderItems);
+        filterSelect.addEventListener('change', renderItems);
+
+        settingsToggle.addEventListener('click', () => {
+            const isOpen = settingsDiv.classList.toggle('open');
+            settingsToggle.innerHTML = isOpen ? '<i class="fas fa-cog"></i> Hide Settings' : '<i class="fas fa-cog"></i> Show Settings';
+        });
+
+        generateTypicalButton.addEventListener('click', generateTypicalList);
+        exportButton.addEventListener('click', exportData);
+        importInput.addEventListener('change', importData);
+        clearListButton.addEventListener('click', clearCurrentList);
+        clearHistoryButton.addEventListener('click', clearHistory);
+
+
+        // --- Initialization ---
+        loadState();
+        renderItems(); // Initial render
+        // Set initial sort/filter values in UI (optional)
+        // sortSelect.value = 'default';
+        // filterSelect.value = 'all';
+
+    </script>
 </body>
 </html>
