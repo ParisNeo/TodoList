@@ -148,7 +148,7 @@
         .item-list li {
             background: #fff; border: 1px solid var(--container-border); border-radius: var(--border-radius);
             margin-bottom: 10px; padding: 10px 12px; display: flex; align-items: center; gap: 8px;
-            position: relative; transition: background-color 0.3s ease, opacity 0.3s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+            position: relative; transition: background-color 0.3s ease, opacity 0.3s ease, box-shadow 0.2s ease, border-color 0.2s ease, max-height 0.3s ease-out, transform 0.25s ease-out, padding 0.3s ease-out, margin 0.3s ease-out;
             opacity: 1; max-height: 100px; overflow: hidden; box-shadow: 0 1px 2px rgba(0,0,0,0.03);
         }
         .item-list li:hover { border-color: #adb5bd; box-shadow: 0 2px 5px rgba(0,0,0,0.06); }
@@ -159,7 +159,7 @@
         .item-list li:hover .drag-handle { opacity: 1; }
         .item-list li.dragging .drag-handle { cursor: grabbing; }
         .item-list li.item-enter { opacity: 0; max-height: 0; padding-top: 0; padding-bottom: 0; margin-bottom: 0; border-width: 0; }
-        .item-list li.item-exit { opacity: 0; max-height: 0 !important; padding-top: 0 !important; padding-bottom: 0 !important; margin-bottom: 0 !important; border-width: 0 !important; transform: translateX(-20px); transition: opacity 0.25s ease-out, max-height 0.3s ease-out, transform 0.25s ease-out, padding 0.3s ease-out, margin 0.3s ease-out, border 0.3s ease-out; }
+        .item-list li.item-exit { opacity: 0; max-height: 0 !important; padding-top: 0 !important; padding-bottom: 0 !important; margin-bottom: 0 !important; border-width: 0 !important; transform: translateX(-20px); }
         html[lang="ar"] .item-list li.item-exit { transform: translateX(20px); }
         .item-list li.dragging { opacity: 0.6; background: #eef2f5; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
         .item-list li.drag-over { border-bottom: 3px solid var(--accent-color); }
@@ -241,7 +241,7 @@
             #add-item-form #submit-item-button span { display: inline; }
              .item-list li { flex-wrap: wrap; }
              .item-details { min-width: 150px; }
-             .item-actions { margin-left: calc(24px + 5px + 8px); }
+             .item-actions { margin-left: calc(24px + 5px + 8px); } /* checkbox width + margin + drag handle padding roughly */
              html[lang="ar"] .item-actions { margin-right: calc(24px + 5px + 8px); margin-left: 0; }
         }
     </style>
@@ -292,7 +292,7 @@
             <header class="app-header">
                 <button id="back-to-main" class="header-button" data-translate-key="backButton" title="Back to List"><i class="fas fa-arrow-left"></i></button>
                 <h1><i class="fas fa-cog"></i> <span data-translate-key="settingsTitle">Settings</span></h1>
-                <div style="width: 40px;"></div>
+                <div style="width: 40px;"></div> <!-- Spacer -->
             </header>
 
             <div class="settings-content">
@@ -302,6 +302,7 @@
                         <option value="en">English</option>
                         <option value="fr">Français</option>
                         <option value="ar">العربية</option>
+                        <!-- Add more languages here -->
                     </select>
                 </div>
                 <div class="settings-row">
@@ -312,6 +313,7 @@
                         <option value="ar-SA">العربية (Saudi Arabia)</option>
                         <option value="en-GB">English (UK)</option>
                         <option value="es-ES">Español (España)</option>
+                        <!-- Add more speech languages here -->
                     </select>
                 </div>
                 <button id="generate-typical-list" data-key="generateTypical"><i class="fas fa-magic"></i> <span data-translate-key="generateTypical">Suggest Usual Items</span></button>
@@ -348,6 +350,7 @@
                 incrementQtyTitle: 'Increase Quantity', decrementQtyTitle: 'Decrease Quantity', settingsButtonTitle: 'Settings', backButtonTitle: 'Back to List',
                 quickAddButton: 'Quick Add Frequent', quickAddTitle: 'Add frequent items', alertQuickAddEmpty: 'No frequent items found in history yet.',
                 alertQuickAddMade: 'Added {count} frequent items.', alertQuickAddFoundNoneNew: 'No new frequent items to add.',
+                alertItemReactivated: '"{itemName}" was in completed items and has been reactivated.',
             },
             fr: { // French Translations
                 title: 'Liste Futée', settingsTitle: 'Paramètres', addItemPlaceholder: 'Entrer un article', quantityPlaceholder: 'Qté (optionnel)',
@@ -369,6 +372,7 @@
                 incrementQtyTitle: 'Augmenter Quantité', decrementQtyTitle: 'Diminuer Quantité', settingsButtonTitle: 'Paramètres', backButtonTitle: 'Retour à la liste',
                 quickAddButton: 'Ajout Rapide Fréquents', quickAddTitle: 'Ajouter articles fréquents', alertQuickAddEmpty: 'Aucun article fréquent trouvé dans l\'historique pour le moment.',
                 alertQuickAddMade: '{count} articles fréquents ajoutés.', alertQuickAddFoundNoneNew: 'Aucun nouvel article fréquent à ajouter.',
+                alertItemReactivated: '"{itemName}" était dans les articles terminés et a été réactivé.',
             },
             ar: { // Arabic Translations
                 title: 'قائمة ذكية', settingsTitle: 'الإعدادات', addItemPlaceholder: 'أدخل عنصر', quantityPlaceholder: 'الكمية (اختياري)',
@@ -390,6 +394,7 @@
                 incrementQtyTitle: 'زيادة الكمية', decrementQtyTitle: 'تقليل الكمية', settingsButtonTitle: 'الإعدادات', backButtonTitle: 'العودة إلى القائمة',
                 quickAddButton: 'إضافة سريعة للمتكرر', quickAddTitle: 'إضافة العناصر المتكررة', alertQuickAddEmpty: 'لم يتم العثور على عناصر متكررة في السجل بعد.',
                 alertQuickAddMade: 'تمت إضافة {count} عناصر متكررة.', alertQuickAddFoundNoneNew: 'لا توجد عناصر متكررة جديدة لإضافتها.',
+                alertItemReactivated: '"{itemName}" كان في العناصر المكتملة وتم إعادة تنشيطه.',
             }
         };
 
@@ -493,12 +498,23 @@
             const isRTL = lang === 'ar';
             document.documentElement.lang = lang;
             document.documentElement.dir = isRTL ? 'rtl' : 'ltr';
-            if (isRTL) {
-                suggestionsList.style.left = 'auto';
-                suggestionsList.style.right = '10px';
-            } else {
-                suggestionsList.style.left = '10px';
-                suggestionsList.style.right = 'auto';
+            // Adjust suggestion list position based on direction
+            if (suggestionsList) {
+                if (isRTL) {
+                    suggestionsList.style.left = 'auto';
+                    const formWidth = addItemForm.offsetWidth;
+                    const inputOffset = itemInput.offsetLeft + itemInput.offsetWidth; // right edge of input in RTL
+                     // The offset is calculated from the right for RTL.
+                    suggestionsList.style.right = `${formWidth - inputOffset}px`;
+
+                } else {
+                    suggestionsList.style.right = 'auto';
+                    suggestionsList.style.left = `${itemInput.offsetLeft}px`;
+                }
+                // Adjust width based on input field width
+                 if (itemInput) {
+                    suggestionsList.style.width = `${itemInput.offsetWidth}px`;
+                }
             }
         };
 
@@ -506,48 +522,74 @@
             currentLanguage = lang;
             localStorage.setItem('smartListLanguage', lang);
             if (uiLangSelect) uiLangSelect.value = lang;
-            setDirection(lang);
-
+            
+            // Update all translatable elements
             document.querySelectorAll('[data-translate-key]').forEach(element => {
                 const key = element.dataset.translateKey;
                 const translation = getTranslation(key);
-                const span = element.querySelector('span:not(.drag-handle i)');
+                const span = element.querySelector('span:not(.drag-handle i)'); // Exclude icons in drag handles
 
                 if (element.tagName === 'INPUT' || element.tagName === 'TEXTAREA') {
                     if (element.placeholder) element.placeholder = translation;
-                } else if (span) {
+                } else if (span && !element.classList.contains('drag-handle')) { // Ensure span is not part of drag handle's icon
                     span.textContent = translation;
-                } else if (element.childNodes.length === 1 && element.childNodes[0].nodeType === Node.TEXT_NODE) {
-                    element.textContent = translation;
+                } else if (element.childNodes.length > 0 && element.childNodes[0].nodeType === Node.TEXT_NODE && element.childNodes[0].textContent.trim() !== '') {
+                     // Find the text node that is not just whitespace
+                    let textNode = Array.from(element.childNodes).find(node => node.nodeType === Node.TEXT_NODE && node.textContent.trim().length > 0);
+                    if (textNode) {
+                        textNode.textContent = translation;
+                    } else if (!element.querySelector('i')) { // If no icon, set full text
+                        element.textContent = translation;
+                    }
                 } else if (element.tagName === 'BUTTON' || element.tagName === 'H1' || element.tagName === 'H2' || element.tagName === 'P' || element.tagName === 'LABEL' || element.tagName === 'OPTION') {
                     let icon = element.querySelector('i');
                     let textNode = Array.from(element.childNodes).find(node => node.nodeType === Node.TEXT_NODE && node.textContent.trim().length > 0);
+                    
                     if (textNode) { textNode.textContent = ` ${translation} `; }
-                    else if (!icon) { element.textContent = translation; }
-                    if (icon && element.firstChild !== icon && document.documentElement.dir === 'ltr') { element.prepend(icon, ' '); }
-                    else if (icon && element.lastChild !== icon && document.documentElement.dir === 'rtl') { element.append(' ', icon); }
+                    else if (!icon) { element.textContent = translation; } // If no icon and no existing text node
+                    // Re-order icon if necessary (RTL/LTR)
+                    if (icon) {
+                        element.normalize(); // Consolidate text nodes
+                        textNode = Array.from(element.childNodes).find(node => node.nodeType === Node.TEXT_NODE && node.textContent.trim().length > 0);
+                        if (!textNode) { // If text node was removed or not found, create one
+                             const newTextNode = document.createTextNode(` ${translation} `);
+                             if (document.documentElement.dir === 'rtl') {
+                                 element.prepend(newTextNode); // Text before icon in RTL
+                             } else {
+                                 element.append(newTextNode); // Text after icon in LTR
+                             }
+                        }
+                    }
                 }
 
-                if (element.title !== undefined) {
-                    let titleKey = key + 'Title';
-                    if (key === 'settingsButton') titleKey = 'settingsButtonTitle';
-                    else if (key === 'backButton') titleKey = 'backButtonTitle';
-                    else if (key === 'quickAddButton') titleKey = 'quickAddTitle';
 
-                    const titleTranslation = getTranslation(titleKey);
-                    if (!titleTranslation.startsWith('Missing key:')) { element.title = titleTranslation; }
-                    else if (key.match(/Button$/) || key.match(/Label$/) || key.match(/Placeholder$/)) { element.title = translation; }
+                // Update titles
+                let titleKey = key; // Base key for title
+                if (element.tagName === 'BUTTON' && (element.id === 'go-to-settings' || element.id === 'back-to-main' || element.id === 'quick-add-button' || element.id === 'audio-input-button' )) {
+                     if (element.id === 'go-to-settings') titleKey = 'settingsButtonTitle';
+                     else if (element.id === 'back-to-main') titleKey = 'backButtonTitle';
+                     else if (element.id === 'quick-add-button') titleKey = 'quickAddTitle';
+                     else if (element.id === 'audio-input-button' && SpeechRecognition) titleKey = 'recordButton'; // Title for record button
+                     else if (element.id === 'audio-input-button' && !SpeechRecognition) titleKey = 'alertSpeechNotSupported';
+                } else if (element.title !== undefined && translations[currentLanguage]?.[key + 'Title']) {
+                    titleKey = key + 'Title';
+                }
+                
+                const titleTranslation = getTranslation(titleKey);
+                if (titleTranslation && !titleTranslation.startsWith('Missing key:')) {
+                    element.title = titleTranslation;
+                } else if (element.title && (key.match(/Button$/) || key.match(/Label$/) || key.match(/Placeholder$/))) {
+                    // Fallback for buttons/labels if specific title key not found but base key exists
+                    if (translation && !translation.startsWith('Missing key:')) {
+                        element.title = translation;
+                    }
                 }
             });
-
-            if(goToSettingsButton) goToSettingsButton.title = getTranslation('settingsButtonTitle');
-            if(backToMainButton) backToMainButton.title = getTranslation('backButtonTitle');
-            if(quickAddButton) quickAddButton.title = getTranslation('quickAddTitle');
-            if(audioButton && !SpeechRecognition) audioButton.title = getTranslation('alertSpeechNotSupported');
-            else if(audioButton) audioButton.title = getTranslation('recordButton');
-
-            renderItems();
+            
+            setDirection(lang); // Apply RTL/LTR specific styles AFTER text is set
+            renderItems(); // Re-render items to apply new language to dynamic elements like item buttons
         };
+
 
         // --- Utility Functions ---
         const generateId = () => `item-${Date.now()}-${Math.random().toString(16).slice(2)}`;
@@ -564,7 +606,7 @@
             try {
                 const storedItems = localStorage.getItem('smartListItems');
                 const storedHistory = localStorage.getItem('smartListItemHistory');
-                currentItems = storedItems ? JSON.parse(storedItems).map(item => ({ ...item, isEditing: item.isEditing || false })) : [];
+                currentItems = storedItems ? JSON.parse(storedItems).map(item => ({ ...item, isEditing: item.isEditing || false, completedAt: item.completedAt || null })) : [];
                 itemPurchaseHistory = storedHistory ? JSON.parse(storedHistory) : {};
                 currentLanguage = localStorage.getItem('smartListLanguage') || 'en';
             } catch (e) {
@@ -596,19 +638,30 @@
             const justUncheckedItems = currentItems.filter(item => item.justUnchecked);
             const otherItems = currentItems.filter(item => !item.justUnchecked);
             const sortedOtherItems = [...otherItems].sort((a, b) => parseInt(a.id.split('-')[1] || 0) - parseInt(b.id.split('-')[1] || 0));
-            const itemsToRender = [...sortedOtherItems, ...justUncheckedItems];
+            
+            // Place newly unchecked items at the top of the active list display by rendering them first among active items.
+            // Or, if you prefer them at the bottom, revert to: const itemsToRender = [...sortedOtherItems, ...justUncheckedItems];
+            const itemsToConsiderForRender = [...justUncheckedItems, ...sortedOtherItems];
 
-            const activeItems = itemsToRender.filter(item => !item.done);
-            const doneItems = itemsToRender.filter(item => item.done);
 
-            activeItems.forEach(item => {
+            let activeItemsToRender = itemsToConsiderForRender.filter(item => !item.done);
+            let doneItemsToRender = itemsToConsiderForRender.filter(item => item.done);
+            
+            // Sort done items by completion date (most recent first)
+            doneItemsToRender.sort((a, b) => {
+                const dateA = a.completedAt ? new Date(a.completedAt) : 0;
+                const dateB = b.completedAt ? new Date(b.completedAt) : 0;
+                return dateB - dateA; // Descending
+            });
+
+            activeItemsToRender.forEach(item => {
                 const el = createItemElement(item);
                 el.classList.add('item-enter');
                 activeList.appendChild(el);
                 requestAnimationFrame(() => { requestAnimationFrame(() => { el.classList.remove('item-enter'); }); });
             });
 
-            doneItems.forEach(item => {
+            doneItemsToRender.forEach(item => {
                 const el = createItemElement(item);
                 el.classList.add('item-enter');
                 doneList.appendChild(el);
@@ -674,14 +727,50 @@
         // --- Item CRUD ---
         const addItem = (text, quantity) => {
             const cleanText = sanitizeText(text);
-            if (!cleanText) { alert(getTranslation('alertNoInput')); return; }
-            const exists = currentItems.some(item => !item.done && sanitizeText(item.text).toLowerCase() === cleanText.toLowerCase());
-            if (exists) { alert(getTranslation('alertItemExists', { itemName: cleanText })); return; }
-            const newItem = { id: generateId(), text: cleanText, quantity: sanitizeText(quantity), done: false, isEditing: false };
-            currentItems.unshift(newItem);
-            updateHistory(cleanText, false);
+            const sanitizedQuantity = sanitizeText(quantity);
+
+            if (!cleanText) {
+                alert(getTranslation('alertNoInput'));
+                return;
+            }
+
+            const existingItemIndex = currentItems.findIndex(item => sanitizeText(item.text).toLowerCase() === cleanText.toLowerCase());
+
+            if (existingItemIndex > -1) {
+                const item = currentItems[existingItemIndex];
+                if (!item.done) { // Item is already active
+                    alert(getTranslation('alertItemExists', { itemName: cleanText }));
+                    return;
+                } else { // Item is in done list, reactivate it
+                    item.done = false;
+                    item.justUnchecked = true; // For animation/positioning
+                    if (sanitizedQuantity) { // Update quantity if new one provided
+                        item.quantity = sanitizedQuantity;
+                    }
+                    delete item.completedAt;
+                    // alert(getTranslation('alertItemReactivated', { itemName: cleanText })); // Optional: notify user
+                    // No need to update history here as it's becoming active, not a new purchase
+                }
+            } else { // New item
+                const newItem = { 
+                    id: generateId(), 
+                    text: cleanText, 
+                    quantity: sanitizedQuantity, 
+                    done: false, 
+                    isEditing: false,
+                    completedAt: null 
+                };
+                currentItems.unshift(newItem); // Add to the beginning of the array
+                updateHistory(cleanText, false); // Update history for suggestion
+            }
+            
             renderItems();
+            itemInput.value = ''; // Clear input fields
+            quantityInput.value = '';
+            itemInput.focus();
+            suggestionsList.classList.add('hidden');
         };
+
         const removeItemWithAnimation = (id, element) => {
             const item = currentItems.find(item => item.id === id);
             if (!item || !confirm(getTranslation('alertRemoveItem', { itemName: item.text }))) return;
@@ -696,7 +785,7 @@
             const hasDone = currentItems.some(item => item.done);
             emptyActiveListMessage.classList.toggle('visible', !hasActive);
             emptyDoneListMessage.classList.toggle('visible', !hasDone);
-            activeList.previousElementSibling.style.display = hasActive ? 'block' : 'none';
+            activeList.previousElementSibling.style.display = (hasActive || currentItems.length === 0) ? 'block' : 'none'; // Show header if list is empty or has active
             doneList.previousElementSibling.style.display = hasDone ? 'block' : 'none';
         };
         const toggleDone = (id) => {
@@ -705,9 +794,16 @@
                 const item = currentItems[itemIndex];
                 const wasDone = item.done;
                 item.done = !item.done;
-                if (item.done && !wasDone) { updateHistory(item.text, true); }
-                else if (!item.done && wasDone) { item.justUnchecked = true; }
-                if (item.isEditing) item.isEditing = false;
+
+                if (item.done && !wasDone) { // Item marked as done
+                    item.completedAt = new Date().toISOString();
+                    updateHistory(item.text, true); 
+                } else if (!item.done && wasDone) { // Item unmarked (became active)
+                    item.justUnchecked = true;
+                    delete item.completedAt;
+                }
+                
+                if (item.isEditing) item.isEditing = false; // Cancel edit mode if toggling done status
                 renderItems();
             }
         };
@@ -728,8 +824,8 @@
                 const item = currentItems[itemIndex];
                 let currentQuantity = parseInt(item.quantity || '0');
                 if (isNaN(currentQuantity)) currentQuantity = 0;
-                let newQuantity = Math.max(0, currentQuantity + change);
-                item.quantity = newQuantity.toString();
+                let newQuantity = Math.max(0, currentQuantity + change); // Quantity cannot be negative
+                item.quantity = newQuantity > 0 ? newQuantity.toString() : ''; // Store as empty string if zero for display
                 renderItems();
             }
         };
@@ -742,6 +838,7 @@
             const historyEntries = Object.entries(itemPurchaseHistory);
             const sortedHistory = historyEntries.sort(([, histA], [, histB]) => (histB.count || 0) - (histA.count || 0));
             const matchingSuggestions = sortedHistory.filter(([text]) => text.includes(lowerQuery)).slice(0, 5);
+            
             if (matchingSuggestions.length > 0) {
                 matchingSuggestions.forEach(([text]) => {
                     const li = document.createElement('li');
@@ -749,6 +846,24 @@
                     li.addEventListener('click', () => { itemInput.value = li.textContent; suggestionsList.classList.add('hidden'); suggestionsList.innerHTML = ''; quantityInput.focus(); });
                     suggestionsList.appendChild(li);
                 });
+                // Position and size suggestions list relative to the input field
+                const inputRect = itemInput.getBoundingClientRect();
+                const formRect = addItemForm.getBoundingClientRect();
+
+                if (document.documentElement.dir === 'rtl') {
+                    suggestionsList.style.left = 'auto';
+                    // Calculate right based on the input's position within the form.
+                    // suggestionsList.style.right = (formRect.right - inputRect.right) + 'px'; // More precise
+                     suggestionsList.style.right = `${addItemForm.offsetWidth - (itemInput.offsetLeft + itemInput.offsetWidth)}px`;
+
+                } else {
+                    suggestionsList.style.right = 'auto';
+                    suggestionsList.style.left = itemInput.offsetLeft + 'px';
+                }
+                suggestionsList.style.width = itemInput.offsetWidth + 'px';
+                suggestionsList.style.top = (itemInput.offsetTop + itemInput.offsetHeight -1) + 'px'; // Position below input
+
+
                 suggestionsList.classList.remove('hidden');
             } else { suggestionsList.classList.add('hidden'); }
         };
@@ -758,10 +873,17 @@
             if (typicalItems.length === 0) { alert(getTranslation('alertNoHistory')); return; }
             let addedCount = 0;
             typicalItems.forEach(text => {
-                const alreadyActive = currentItems.some(item => !item.done && sanitizeText(item.text).toLowerCase() === text);
-                if (!alreadyActive) { const originalCaseText = Object.keys(itemPurchaseHistory).find(k => k.toLowerCase() === text) || text; addItem(originalCaseText.charAt(0).toUpperCase() + originalCaseText.slice(1), ''); addedCount++; }
+                const originalCaseText = Object.keys(itemPurchaseHistory).find(k => k.toLowerCase() === text) || text;
+                // addItem will handle if it's active, done, or new
+                const itemCleanText = sanitizeText(originalCaseText.charAt(0).toUpperCase() + originalCaseText.slice(1));
+                const existingItem = currentItems.find(i => sanitizeText(i.text).toLowerCase() === itemCleanText.toLowerCase());
+                if (!existingItem || existingItem.done) { // Add if new, or reactivate if done
+                    addItem(itemCleanText, ''); 
+                    addedCount++;
+                }
             });
-            if (addedCount === 0) alert(getTranslation('alertItemsExist'));
+            if (addedCount === 0 && typicalItems.length > 0) alert(getTranslation('alertItemsExist'));
+            else if (addedCount > 0) { /* Optional: some feedback for added items */ }
         };
         const addFrequentItems = () => {
             const maxToAdd = 5;
@@ -770,8 +892,14 @@
             let addedCount = 0;
             for (const text of frequentItems) {
                 if (addedCount >= maxToAdd) break;
-                const alreadyActive = currentItems.some(item => !item.done && sanitizeText(item.text).toLowerCase() === text);
-                if (!alreadyActive) { const originalCaseText = Object.keys(itemPurchaseHistory).find(k => k.toLowerCase() === text) || text; addItem(originalCaseText.charAt(0).toUpperCase() + originalCaseText.slice(1), ''); addedCount++; }
+                const originalCaseText = Object.keys(itemPurchaseHistory).find(k => k.toLowerCase() === text) || text;
+                const itemCleanText = sanitizeText(originalCaseText.charAt(0).toUpperCase() + originalCaseText.slice(1));
+                const existingItem = currentItems.find(i => sanitizeText(i.text).toLowerCase() === itemCleanText.toLowerCase() && !i.done);
+
+                if (!existingItem) { // Only add if not already active (addItem will handle reactivating from done)
+                    addItem(itemCleanText, ''); 
+                    addedCount++;
+                }
             }
             if (addedCount > 0) {
                  console.log(getTranslation('alertQuickAddMade', { count: addedCount }));
@@ -800,7 +928,7 @@
                         const hasList = Array.isArray(importedData.currentList);
                         const hasHistory = typeof importedData.purchaseHistory === 'object';
                         if (!confirm(getTranslation('alertImportConfirm'))) { importInput.value = ''; return; }
-                        currentItems = hasList ? importedData.currentList.map(item => ({...item, isEditing: false })) : [];
+                        currentItems = hasList ? importedData.currentList.map(item => ({...item, isEditing: false, completedAt: item.completedAt || null })) : [];
                         itemPurchaseHistory = hasHistory ? importedData.purchaseHistory : {};
                         renderItems(); alert(getTranslation('alertImportSuccess')); showMainView();
                     } else { throw new Error('Invalid file format.'); }
@@ -815,13 +943,20 @@
                 const allItemElements = [...activeList.children, ...doneList.children];
                 if (allItemElements.length > 0) {
                     allItemElements.forEach(el => el.classList.add('item-exit'));
-                    allItemElements[allItemElements.length - 1].addEventListener('transitionend', () => { currentItems = []; renderItems(); }, { once: true });
+                    // Wait for the last animation to complete before clearing data
+                    const lastAnimatedElement = allItemElements[allItemElements.length - 1];
+                    if (lastAnimatedElement) {
+                        lastAnimatedElement.addEventListener('transitionend', () => { currentItems = []; renderItems(); }, { once: true });
+                    } else { // Should not happen if allItemElements.length > 0
+                         currentItems = []; renderItems();
+                    }
                 } else { currentItems = []; renderItems(); }
             } else if (currentItems.length === 0) { alert(getTranslation('alertListEmpty')); }
         };
         const clearHistory = () => {
             if (Object.keys(itemPurchaseHistory).length > 0 && confirm(getTranslation('alertClearHistory'))) {
-                itemPurchaseHistory = {}; renderItems();
+                itemPurchaseHistory = {}; saveState(); // Save empty history
+                // No need to call renderItems() unless history affects display directly beyond suggestions
             } else if (Object.keys(itemPurchaseHistory).length === 0) { alert(getTranslation('alertHistoryEmpty')); }
         };
 
@@ -850,10 +985,10 @@
             });
         }
         function addTouchListenersToHandle(handle, item) {
-            let touchStartY = 0, currentTouchY = 0, touchDraggedItem = null, touchDragOverElement = null;
+            let touchStartY = 0, currentTouchY = 0, touchDraggedItem = null, touchDragOverElement = null, scrollInterval = null;
             handle.ontouchstart = (e) => { touchDraggedItem = item; touchStartY = e.touches[0].clientY; touchDraggedItem.style.opacity = '0.6'; touchDraggedItem.style.zIndex = '1000'; touchDraggedItem.style.transition = 'none'; document.addEventListener('touchmove', handleTouchMove, { passive: false }); document.addEventListener('touchend', handleTouchEnd, { once: true }); };
-            const handleTouchMove = (e) => { if (!touchDraggedItem) return; e.preventDefault(); currentTouchY = e.touches[0].clientY; const diffY = currentTouchY - touchStartY; touchDraggedItem.style.transform = `translateY(${diffY}px) scale(1.02)`; const elementUnderTouch = document.elementFromPoint(e.touches[0].clientX, e.touches[0].clientY); const potentialTarget = elementUnderTouch ? elementUnderTouch.closest('li') : null; if (potentialTarget && potentialTarget !== touchDraggedItem && potentialTarget.parentElement.id === touchDraggedItem.parentElement.id) { if (touchDragOverElement && touchDragOverElement !== potentialTarget) { touchDragOverElement.classList.remove('drag-over'); } if (potentialTarget !== touchDragOverElement) { potentialTarget.classList.add('drag-over'); touchDragOverElement = potentialTarget; } } else { if (touchDragOverElement) { touchDragOverElement.classList.remove('drag-over'); touchDragOverElement = null; } } const viewportHeight = window.innerHeight; const scrollThreshold = 60; const scrollSpeed = 10; if (currentTouchY < scrollThreshold) { window.scrollBy(0, -scrollSpeed); } else if (currentTouchY > viewportHeight - scrollThreshold) { window.scrollBy(0, scrollSpeed); } };
-            const handleTouchEnd = () => { document.removeEventListener('touchmove', handleTouchMove); if (!touchDraggedItem) return; touchDraggedItem.style.opacity = '1'; touchDraggedItem.style.transform = 'translateY(0) scale(1)'; touchDraggedItem.style.zIndex = 'auto'; touchDraggedItem.style.transition = ''; if (touchDragOverElement) { touchDragOverElement.classList.remove('drag-over'); const draggedId = touchDraggedItem.dataset.id; const targetId = touchDragOverElement.dataset.id; const draggedIndex = currentItems.findIndex(item => item.id === draggedId); let targetIndex = currentItems.findIndex(item => item.id === targetId); if (draggedIndex !== -1 && targetIndex !== -1) { const [movedItem] = currentItems.splice(draggedIndex, 1); targetIndex = currentItems.findIndex(item => item.id === targetId); currentItems.splice(targetIndex, 0, movedItem); renderItems(); } } touchDraggedItem = null; touchDragOverElement = null; };
+            const handleTouchMove = (e) => { if (!touchDraggedItem) return; e.preventDefault(); currentTouchY = e.touches[0].clientY; const diffY = currentTouchY - touchStartY; touchDraggedItem.style.transform = `translateY(${diffY}px) scale(1.02)`; const elementUnderTouch = document.elementFromPoint(e.touches[0].clientX, e.touches[0].clientY); const potentialTarget = elementUnderTouch ? elementUnderTouch.closest('li') : null; if (potentialTarget && potentialTarget !== touchDraggedItem && potentialTarget.parentElement.id === touchDraggedItem.parentElement.id) { if (touchDragOverElement && touchDragOverElement !== potentialTarget) { touchDragOverElement.classList.remove('drag-over'); } if (potentialTarget !== touchDragOverElement) { potentialTarget.classList.add('drag-over'); touchDragOverElement = potentialTarget; } } else { if (touchDragOverElement) { touchDragOverElement.classList.remove('drag-over'); touchDragOverElement = null; } } const viewportHeight = window.innerHeight; const scrollThreshold = 80; const scrollSpeed = 15; clearInterval(scrollInterval); if (currentTouchY < scrollThreshold) { scrollInterval = setInterval(() => window.scrollBy(0, -scrollSpeed), 50); } else if (currentTouchY > viewportHeight - scrollThreshold) { scrollInterval = setInterval(() => window.scrollBy(0, scrollSpeed), 50); } };
+            const handleTouchEnd = () => { document.removeEventListener('touchmove', handleTouchMove); clearInterval(scrollInterval); if (!touchDraggedItem) return; touchDraggedItem.style.opacity = '1'; touchDraggedItem.style.transform = 'translateY(0) scale(1)'; touchDraggedItem.style.zIndex = 'auto'; touchDraggedItem.style.transition = ''; if (touchDragOverElement) { touchDragOverElement.classList.remove('drag-over'); const draggedId = touchDraggedItem.dataset.id; const targetId = touchDragOverElement.dataset.id; const draggedIndex = currentItems.findIndex(item => item.id === draggedId); let targetIndex = currentItems.findIndex(item => item.id === targetId); if (draggedIndex !== -1 && targetIndex !== -1) { const [movedItem] = currentItems.splice(draggedIndex, 1); targetIndex = currentItems.findIndex(item => item.id === targetId); currentItems.splice(targetIndex, 0, movedItem); renderItems(); } } touchDraggedItem = null; touchDragOverElement = null; };
         }
 
         // --- Page Navigation ---
@@ -861,10 +996,19 @@
         const showMainView = () => { settingsPage.classList.remove('visible'); mainView.classList.remove('hidden'); };
 
         // --- Event Listeners ---
-        addItemForm.addEventListener('submit', (e) => { e.preventDefault(); addItem(itemInput.value, quantityInput.value); itemInput.value = ''; quantityInput.value = ''; itemInput.focus(); suggestionsList.classList.add('hidden'); });
+        addItemForm.addEventListener('submit', (e) => { e.preventDefault(); addItem(itemInput.value, quantityInput.value); });
         itemInput.addEventListener('input', () => showSuggestions(itemInput.value));
         itemInput.addEventListener('focus', () => showSuggestions(itemInput.value));
-        document.addEventListener('click', (e) => { if (!itemInput.contains(e.target) && !suggestionsList.contains(e.target) && !addItemFormContainer.contains(e.target)) { suggestionsList.classList.add('hidden'); } });
+        // Global click listener to hide suggestions when clicking outside relevant areas
+        document.addEventListener('click', (e) => { 
+            const path = e.composedPath(); // Get the full event path
+            const isClickInsideFormOrSuggestions = path.some(el => 
+                el === addItemFormContainer || el === suggestionsList
+            );
+            if (!isClickInsideFormOrSuggestions) {
+                suggestionsList.classList.add('hidden');
+            }
+        });
         quickAddButton.addEventListener('click', addFrequentItems);
         goToSettingsButton.addEventListener('click', showSettingsPage);
         backToMainButton.addEventListener('click', showMainView);
@@ -874,10 +1018,19 @@
         if (importInput) importInput.addEventListener('change', importData);
         if (clearListButton) clearListButton.addEventListener('click', clearCurrentList);
         if (clearHistoryButton) clearHistoryButton.addEventListener('click', clearHistory);
+        
+        // Adjust suggestion list on window resize
+        window.addEventListener('resize', () => {
+            if (!suggestionsList.classList.contains('hidden')) {
+                showSuggestions(itemInput.value); // Re-calculate position and width
+            }
+             setDirection(currentLanguage); // re-evaluate suggestion box position on resize too
+        });
 
         // --- Initialization ---
         loadState();
         setLanguage(currentLanguage); // Applies language, direction, and initial render
+        checkEmptyMessages(); // Ensure empty messages are correct on load
 
     </script>
 </body>
