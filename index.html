@@ -1,98 +1,884 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>Smart List</title>
+    <link rel="shortcut icon" type="image/x-icon" href="logo.ico">
+    <meta name="description" content="A simple and smart list app, great for groceries.">
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" integrity="sha512-iecdLmaskl7CVkqkXNQ/ZH/XLlvWZOJyj7Yy7tcenmpD1ypASozpmT/E0iPtmFIB46ZmdtAc9eNBvH0H/ZpiBw==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            --bg-color: #f8f9fa;
+            --container-bg: #ffffff;
+            --container-border: #e9ecef;
+            --text-color: #212529;
+            --text-color-muted: #6c757d;
+            --accent-color: #007bff;
+            --accent-color-darker: #0056b3;
+            --done-color-bg: #e6f7ff;
+            --done-text-color: #5a6a7e;
+            --danger-color: #dc3545;
+            --danger-color-darker: #c82333;
+            --shadow-color: rgba(0, 0, 0, 0.06);
+            --border-radius: 10px;
+            --header-height: 60px;
+            --quick-add-bg: #e7f3ff;
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        html { height: 100%; font-size: 16px; }
+        body {
+            font-family: 'Poppins', 'Cairo', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--bg-color); color: var(--text-color); min-height: 100vh;
+            display: flex; justify-content: center; align-items: flex-start; padding: 0;
+            -webkit-tap-highlight-color: transparent;
+        }
+        html[lang="ar"] body { direction: rtl; }
+        html[lang="ar"] .app-header h1 { flex-direction: row-reverse; }
+        html[lang="ar"] .app-header h1 i { margin-left: 10px; margin-right: 0; }
+        html[lang="ar"] #add-item-form { flex-direction: row-reverse; }
+        html[lang="ar"] #add-item-form .button-group { margin-right: auto; margin-left: 0; }
+        html[lang="ar"] #suggestions-list { right: 10px; left: auto; }
+        html[lang="ar"] .item-list li { flex-direction: row-reverse; }
+        html[lang="ar"] .drag-handle { margin-right: -5px; margin-left: 0; }
+        html[lang="ar"] .item-checkbox { margin-left: 5px; margin-right: 0; }
+        html[lang="ar"] .item-actions { gap: 5px; }
+        html[lang="ar"] footer a i { margin: 0 3px; }
+        html[lang="ar"] .settings-row { flex-direction: row-reverse; }
+        html[lang="ar"] .settings-row label:first-child { margin-left: 12px; margin-right: 0; }
+        html[lang="ar"] #settings-page .app-header { flex-direction: row-reverse; }
+        html[lang="ar"] #settings-page .app-header h1 { flex-direction: row-reverse; }
+        html[lang="ar"] #settings-page .app-header h1 i { margin-left: 10px; margin-right: 0; }
+        html[lang="ar"] #settings-page .app-header .header-button { order: -1; }
+        html[lang="ar"] #settings-page .app-header div { order: 1; }
+        #smart-list-app {
+            width: 100%; max-width: 700px; background: var(--container-bg); min-height: 100vh;
+            display: flex; flex-direction: column; position: relative; overflow-x: hidden;
+        }
+        .page-view {
+            padding: 20px; flex-grow: 1; display: flex; flex-direction: column; gap: 20px;
+            transition: transform 0.3s ease-in-out, opacity 0.3s ease-in-out;
+            background-color: var(--container-bg); width: 100%; box-shadow: 0 3px 10px var(--shadow-color);
+        }
+        #settings-page {
+            position: absolute; top: 0; left: 0; height: 100%; z-index: 100;
+            transform: translateX(100%); opacity: 0; visibility: hidden; overflow-y: auto;
+        }
+        html[lang="ar"] #settings-page { transform: translateX(-100%); }
+        #settings-page.visible { transform: translateX(0); opacity: 1; visibility: visible; }
+        #main-view { transform: translateX(0); opacity: 1; visibility: visible; }
+        #main-view.hidden { transform: translateX(-50%); opacity: 0; visibility: hidden; }
+        html[lang="ar"] #main-view.hidden { transform: translateX(50%); }
+        .app-header {
+            display: flex; align-items: center; justify-content: space-between; padding: 15px 20px;
+            background-color: #fff; border-bottom: 1px solid var(--container-border); height: var(--header-height);
+            position: sticky; top: 0; z-index: 50; box-shadow: 0 2px 4px rgba(0,0,0,0.03);
+        }
+        .app-header h1 {
+            font-weight: 600; color: var(--accent-color); margin: 0; display: flex;
+            align-items: center; gap: 10px; font-size: 1.5rem;
+        }
+        .app-header h1 i { margin-right: 10px; }
+        .header-button {
+            background: none; border: none; color: var(--text-color-muted); font-size: 1.4rem; padding: 8px;
+            cursor: pointer; border-radius: 50%; width: 40px; height: 40px; display: inline-flex;
+            align-items: center; justify-content: center; transition: background-color 0.2s ease, color 0.2s ease;
+        }
+        .header-button:hover { background-color: #f1f3f5; color: var(--accent-color); }
+        .header-button i { line-height: 1; }
+        #add-item-form-container {
+             padding: 10px; background-color: #f8f9fa; border-radius: var(--border-radius);
+             display: flex; flex-direction: column; gap: 10px;
+        }
+        #add-item-form { display: flex; gap: 10px; flex-wrap: wrap; position: relative; }
+        #add-item-form input[type="text"] { flex-grow: 1; min-width: 150px; }
+        #item-quantity { width: 100px; flex-shrink: 0; }
+        input[type="text"], select {
+            background: #fff; border: 1px solid var(--container-border); color: var(--text-color);
+            border-radius: var(--border-radius); padding: 12px 15px; font-size: 1rem; font-family: inherit;
+            transition: border-color 0.2s ease, box-shadow 0.2s ease; height: 48px;
+        }
+        input[type="text"]::placeholder { color: var(--text-color-muted); opacity: 0.9; }
+        input[type="text"]:focus, select:focus {
+            outline: none; border-color: var(--accent-color); box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.2);
+        }
+        button, .button-like {
+            background-color: #fff; border: 1px solid var(--container-border); color: var(--text-color-muted);
+            border-radius: var(--border-radius); padding: 10px 15px; cursor: pointer; font-size: 1rem;
+            font-family: inherit; transition: background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease, transform 0.1s ease;
+            display: inline-flex; align-items: center; justify-content: center; gap: 8px; font-weight: 500;
+            height: 48px; line-height: 1; flex-shrink: 0;
+        }
+        button:hover, .button-like:hover { border-color: var(--accent-color); color: var(--accent-color); background-color: #e7f3ff; }
+        button:active { transform: scale(0.97); }
+        button i, .button-like i { font-size: 1.1em; }
+        #submit-item-button { background-color: var(--accent-color); border-color: var(--accent-color); color: #fff; min-width: 100px; }
+        #submit-item-button:hover { background-color: var(--accent-color-darker); border-color: var(--accent-color-darker); color: #fff; }
+        #audio-input-button { min-width: 48px; }
+        #audio-input-button.recording { background-color: var(--danger-color); border-color: var(--danger-color); color: white; animation: pulse 1.5s infinite ease-in-out; }
+        @keyframes pulse { 0%, 100% { box-shadow: 0 0 8px 0px rgba(220, 53, 69, 0.5); } 50% { box-shadow: 0 0 12px 4px rgba(220, 53, 69, 0.7); } }
+        #quick-add-button {
+             background-color: var(--quick-add-bg); border-color: #b8daff; color: var(--accent-color-darker);
+             font-weight: 500; width: 100%; height: auto; padding: 10px 15px;
+        }
+        #quick-add-button:hover { background-color: #d1e7ff; border-color: var(--accent-color); }
+        #suggestions-list {
+            list-style-type: none; margin: 0; max-height: 180px; overflow-y: auto; background: #fff;
+            border: 1px solid var(--container-border); border-top: none; border-radius: 0 0 var(--border-radius) var(--border-radius);
+            position: absolute; top: calc(100% - 5px); left: 10px; width: calc(100% - 20px - 100px - 48px - 30px);
+            max-width: 400px; z-index: 100; box-shadow: 0 4px 8px rgba(0,0,0,0.08); padding: 5px 0;
+            opacity: 0; visibility: hidden; transform: translateY(-10px);
+            transition: opacity 0.2s ease, visibility 0.2s ease, transform 0.2s ease;
+        }
+        #suggestions-list:not(.hidden) { opacity: 1; visibility: visible; transform: translateY(0); }
+        #suggestions-list li { padding: 10px 15px; cursor: pointer; transition: background-color 0.2s ease; font-size: 0.95rem; }
+        #suggestions-list li:hover { background-color: var(--accent-color-darker); color: white; }
+        .list-section { margin-top: 15px; }
+        .list-section h2 {
+            font-size: 1rem; font-weight: 600; color: var(--text-color-muted); margin-bottom: 10px;
+            padding: 0 5px; text-transform: uppercase; letter-spacing: 0.5px;
+        }
+        .item-list { list-style: none; padding: 0; }
+        .item-list li {
+            background: #fff; border: 1px solid var(--container-border); border-radius: var(--border-radius);
+            margin-bottom: 10px; padding: 10px 12px; display: flex; align-items: center; gap: 8px;
+            position: relative; transition: background-color 0.3s ease, opacity 0.3s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+            opacity: 1; max-height: 100px; overflow: hidden; box-shadow: 0 1px 2px rgba(0,0,0,0.03);
+        }
+        .item-list li:hover { border-color: #adb5bd; box-shadow: 0 2px 5px rgba(0,0,0,0.06); }
+        .drag-handle {
+            cursor: grab; color: var(--text-color-muted); padding: 10px 5px; margin-left: -5px;
+            font-size: 1.3rem; opacity: 0.5; transition: opacity 0.2s ease; flex-shrink: 0;
+        }
+        .item-list li:hover .drag-handle { opacity: 1; }
+        .item-list li.dragging .drag-handle { cursor: grabbing; }
+        .item-list li.item-enter { opacity: 0; max-height: 0; padding-top: 0; padding-bottom: 0; margin-bottom: 0; border-width: 0; }
+        .item-list li.item-exit { opacity: 0; max-height: 0 !important; padding-top: 0 !important; padding-bottom: 0 !important; margin-bottom: 0 !important; border-width: 0 !important; transform: translateX(-20px); transition: opacity 0.25s ease-out, max-height 0.3s ease-out, transform 0.25s ease-out, padding 0.3s ease-out, margin 0.3s ease-out, border 0.3s ease-out; }
+        html[lang="ar"] .item-list li.item-exit { transform: translateX(20px); }
+        .item-list li.dragging { opacity: 0.6; background: #eef2f5; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
+        .item-list li.drag-over { border-bottom: 3px solid var(--accent-color); }
+        .item-checkbox {
+            appearance: none; width: 26px; height: 26px; border: 2px solid #ced4da; border-radius: var(--border-radius);
+            cursor: pointer; position: relative; flex-shrink: 0; transition: background-color 0.2s ease, border-color 0.2s ease;
+            margin-right: 5px;
+        }
+        .item-checkbox:hover { border-color: var(--accent-color); }
+        .item-checkbox:checked { background-color: var(--accent-color); border-color: var(--accent-color); }
+        .item-checkbox:checked::after { content: '\f00c'; font-family: 'Font Awesome 6 Free'; font-weight: 900; font-size: 14px; color: #fff; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); }
+        .item-details { flex-grow: 1; display: flex; flex-direction: column; overflow: hidden; }
+        .item-text { font-size: 1rem; font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; transition: opacity 0.3s ease; }
+        .item-quantity-display-wrapper { display: flex; align-items: center; gap: 5px; margin-top: 4px; }
+        .item-quantity-display { font-size: 0.85rem; color: var(--text-color-muted); }
+        .item-quantity-display:empty { display: none; }
+        .quantity-stepper button { background: none; border: none; color: var(--text-color-muted); font-size: 1rem; padding: 2px 5px; cursor: pointer; border-radius: 4px; height: auto; min-width: auto; }
+        .quantity-stepper button:hover { background-color: #e9ecef; color: var(--text-color); }
+        .item-details input[type="text"] { width: 100%; margin-bottom: 5px; padding: 8px 10px; height: auto; }
+        #done-list li { background-color: var(--done-color-bg); border-color: #b8e0ff; }
+        #done-list li .item-text, #done-list li .item-quantity-display { text-decoration: line-through; color: var(--done-text-color); opacity: 0.8; }
+        #done-list li .item-checkbox:checked { background-color: #6cbfff; border-color: #6cbfff; }
+        #done-list li .drag-handle { opacity: 0.3; }
+        .item-actions { display: flex; gap: 5px; flex-shrink: 0; }
+        .item-actions button { padding: 8px; font-size: 1rem; background: transparent; border: none; color: var(--text-color-muted); border-radius: 50%; width: 36px; height: 36px; min-width: auto; }
+        .item-actions button:hover { background: #e9ecef; color: var(--text-color); }
+        .item-actions .remove-button { color: var(--danger-color); }
+        .item-actions .remove-button:hover { color: white; background-color: var(--danger-color); }
+        .item-actions .edit-button { color: var(--accent-color); }
+        .item-actions .edit-button:hover { color: white; background-color: var(--accent-color); }
+        .item-actions .save-button { color: #28a745; }
+        .item-actions .save-button:hover { color: white; background-color: #28a745; }
+        .item-actions .cancel-button { color: var(--text-color-muted); }
+        .item-actions .cancel-button:hover { color: white; background-color: #6c757d; }
+        #settings-page .settings-content { display: flex; flex-direction: column; gap: 18px; padding-bottom: 30px; }
+        #settings-page .settings-row { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+        #settings-page .settings-row label:first-child { min-width: 90px; font-weight: 500; margin-right: 12px; }
+        #settings-page .settings-content button, #settings-page .settings-content label.button-like { width: 100%; justify-content: center; padding: 14px 18px; font-size: 1.05rem; height: auto; }
+        #settings-page .settings-content button.danger-button, #settings-page .settings-content button[data-key="clearHistory"] { background-color: var(--danger-color); border-color: var(--danger-color); color: white; }
+        #settings-page .settings-content button.danger-button:hover, #settings-page .settings-content button[data-key="clearHistory"]:hover { background-color: var(--danger-color-darker); border-color: var(--danger-color-darker); }
+        .button-like { display: inline-block; text-align: center; background: #fff; border: 1px solid var(--container-border); color: var(--text-color-muted); border-radius: var(--border-radius); cursor: pointer; transition: background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease; height: auto; padding: 14px 18px; font-size: 1.05rem; }
+        .button-like:hover { border-color: var(--accent-color); color: var(--accent-color); background-color: #e7f3ff;}
+        input[type="file"] { display: none; }
+        .empty-list-message { text-align: center; color: var(--text-color-muted); padding: 35px 20px; font-style: italic; display: none; border: 1px dashed var(--container-border); border-radius: var(--border-radius); margin-top: 15px; background-color: #f8f9fa; }
+        .empty-list-message.visible { display: block; }
+        footer { text-align: center; padding: 20px; font-size: 0.85rem; color: var(--text-color-muted); opacity: 0.8; border-top: 1px solid var(--container-border); margin-top: auto; background: #fff; }
+        footer a { color: var(--accent-color); text-decoration: none; margin: 0 5px; transition: color 0.2s ease; }
+        footer a:hover { color: var(--accent-color-darker); }
+        footer .fab { font-size: 1.2rem; vertical-align: middle; }
+        @media (max-width: 600px) {
+            .page-view { padding: 15px; }
+            .app-header { padding: 10px 15px; height: 55px; }
+            .app-header h1 { font-size: 1.3rem; gap: 8px; }
+            .header-button { font-size: 1.3rem; width: 36px; height: 36px; padding: 6px; }
+            #add-item-form-container { padding: 8px; }
+            #add-item-form { flex-direction: column; align-items: stretch; }
+            #add-item-form input[type="text"], #item-quantity { width: 100%; }
+            #item-quantity { margin-top: 8px; }
+            #add-item-form .button-group { display: flex; gap: 8px; margin-top: 8px; }
+            #add-item-form #submit-item-button { flex-grow: 1; }
+            #suggestions-list { width: calc(100% - 16px); left: 8px; top: calc(100% + 10px); }
+            html[lang="ar"] #suggestions-list { right: 8px; left: auto; }
+            .item-list li { gap: 5px; padding: 8px 10px; }
+            .drag-handle { font-size: 1.2rem; padding: 8px 4px; margin-left: -4px;}
+            html[lang="ar"] .drag-handle { margin-right: -4px; margin-left: 0;}
+            .item-checkbox { width: 24px; height: 24px; }
+            .item-text { font-size: 0.95rem; }
+            .item-quantity-display { font-size: 0.8rem; }
+            .quantity-stepper button { font-size: 0.9rem; }
+            .item-actions { gap: 3px; }
+            .item-actions button { width: 32px; height: 32px; font-size: 0.9rem; }
+            #settings-page .settings-row label:first-child { min-width: 70px; }
+            footer { font-size: 0.8rem; padding: 15px; }
+        }
+        @media (max-width: 380px) {
+            .app-header h1 { font-size: 1.2rem; }
+            #add-item-form .button-group button span { display: none; }
+            #add-item-form .button-group button i { margin: 0; }
+            #add-item-form #submit-item-button span { display: inline; }
+             .item-list li { flex-wrap: wrap; }
+             .item-details { min-width: 150px; }
+             .item-actions { margin-left: calc(24px + 5px + 8px); }
+             html[lang="ar"] .item-actions { margin-right: calc(24px + 5px + 8px); margin-left: 0; }
+        }
+    </style>
+</head>
+<body>
+    <div id="smart-list-app">
+
+        <div id="main-view" class="page-view">
+            <header class="app-header">
+                <h1><i class="fas fa-list-check"></i> <span data-translate-key="title">Smart List</span></h1>
+                <button id="go-to-settings" class="header-button" data-translate-key="settingsButton" title="Settings"><i class="fas fa-cog"></i></button>
+            </header>
+
+            <div id="add-item-form-container">
+                <form id="add-item-form">
+                    <input type="text" id="add-item-input" data-translate-key="addItemPlaceholder" placeholder="Enter item" autocomplete="off" required>
+                    <ul id="suggestions-list" class="hidden"></ul>
+                    <input type="text" id="item-quantity" data-translate-key="quantityPlaceholder" placeholder="Qty (optional)">
+                    <div class="button-group">
+                        <button id="audio-input-button" type="button" data-translate-key="recordButton" title="Record Item Name"><i class="fas fa-microphone"></i></button>
+                        <button type="submit" id="submit-item-button" data-translate-key="addButton" title="Add Item"><i class="fas fa-plus"></i> <span>Add</span></button>
+                    </div>
+                </form>
+                <button id="quick-add-button" type="button" data-translate-key="quickAddButton" title="Add frequent items"><i class="fas fa-bolt"></i> <span>Quick Add Frequent</span></button>
+            </div>
+
+            <div class="list-section">
+                <h2 data-translate-key="activeItemsHeader">Active</h2>
+                <ul id="active-list" class="item-list"></ul>
+                <p id="empty-active-list-message" class="empty-list-message" data-translate-key="emptyActiveList">No active items. Add some!</p>
+            </div>
+
+            <div class="list-section">
+                <h2 data-translate-key="doneItemsHeader">Completed</h2>
+                <ul id="done-list" class="item-list"></ul>
+                <p id="empty-done-list-message" class="empty-list-message" data-translate-key="emptyDoneList">No completed items yet.</p>
+            </div>
+
+            <footer id="main-footer">
+                <span data-translate-key="footerText">Built with</span> <i class="fas fa-heart" style="color: #e06c75;"></i> & AI |
+                <a href="#" target="_blank" title="Share on Twitter"><i class="fab fa-twitter"></i></a>
+                <a href="#" target="_blank" title="Share on LinkedIn"><i class="fab fa-linkedin"></i></a>
+                <a href="#" target="_blank" title="Share on Facebook"><i class="fab fa-facebook"></i></a>
+            </footer>
+        </div>
+
+        <div id="settings-page" class="page-view">
+            <header class="app-header">
+                <button id="back-to-main" class="header-button" data-translate-key="backButton" title="Back to List"><i class="fas fa-arrow-left"></i></button>
+                <h1><i class="fas fa-cog"></i> <span data-translate-key="settingsTitle">Settings</span></h1>
+                <div style="width: 40px;"></div>
+            </header>
+
+            <div class="settings-content">
+                <div class="settings-row">
+                    <label for="ui_language" data-translate-key="languageLabel">Language:</label>
+                    <select id="ui_language">
+                        <option value="en">English</option>
+                        <option value="fr">Français</option>
+                        <option value="ar">العربية</option>
+                    </select>
+                </div>
+                <div class="settings-row">
+                    <label for="audio_input_language" data-translate-key="speechLanguageLabel">Speech:</label>
+                    <select id="audio_input_language">
+                        <option value="en-US">English (US)</option>
+                        <option value="fr-FR">Français (France)</option>
+                        <option value="ar-SA">العربية (Saudi Arabia)</option>
+                        <option value="en-GB">English (UK)</option>
+                        <option value="es-ES">Español (España)</option>
+                    </select>
+                </div>
+                <button id="generate-typical-list" data-key="generateTypical"><i class="fas fa-magic"></i> <span data-translate-key="generateTypical">Suggest Usual Items</span></button>
+                <label class="button-like" for="import-items" data-key="importLabel"><i class="fas fa-upload"></i> <span data-translate-key="importLabel">Import List (.json)</span></label>
+                <input type="file" id="import-items" accept=".json">
+                <button id="export-items" data-key="exportButton"><i class="fas fa-download"></i> <span data-translate-key="exportButton">Export List (.json)</span></button>
+                <button id="clear-list" class="danger-button" data-key="clearList"><i class="fas fa-trash-alt"></i> <span data-translate-key="clearList">Clear Current List</span></button>
+                <button id="clear-history" class="danger-button" data-key="clearHistory"><i class="fas fa-history"></i> <span data-translate-key="clearHistory">Clear Purchase History</span></button>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        // --- Translations ---
+        const translations = {
+            en: {
+                title: 'Smart List', settingsTitle: 'Settings', addItemPlaceholder: 'Enter item', quantityPlaceholder: 'Qty (optional)',
+                recordButton: 'Record Item Name', addButton: 'Add', activeItemsHeader: 'Active', doneItemsHeader: 'Completed',
+                emptyActiveList: 'No active items. Add some!', emptyDoneList: 'No completed items yet.', languageLabel: 'Language:',
+                speechLanguageLabel: 'Speech:', generateTypical: 'Suggest Usual Items', importLabel: 'Import List (.json)',
+                exportButton: 'Export List (.json)', clearList: 'Clear Current List', clearHistory: 'Clear Purchase History',
+                footerText: 'Built with', alertRemoveItem: 'Are you sure you want to remove "{itemName}"?',
+                alertClearList: 'Are you sure you want to clear all items from the current list?',
+                alertClearHistory: 'WARNING: This will permanently delete all history and suggestions data. Are you sure?',
+                alertItemExists: '"{itemName}" is already on the active list.', alertNoHistory: 'Not enough history to generate suggestions. Keep using the app!',
+                alertItemsAdded: 'Added {count} frequent items to your list.', alertItemsExist: 'Your current list already contains most of your typical items.',
+                alertExportSuccess: 'Data exported successfully!', alertExportFailed: 'Failed to export data.',
+                alertImportConfirm: 'This will replace your current list and history. Are you sure?', alertImportSuccess: 'Data imported successfully!',
+                alertImportFailed: 'Failed to import data: {error}', alertReadFileFailed: 'Failed to read the file.',
+                alertListEmpty: 'List is already empty.', alertHistoryEmpty: 'History is already empty.', alertNoInput: 'Please enter an item name.',
+                alertSpeechError: 'Speech recognition error: {error}', alertSpeechNotSupported: 'Sorry, your browser doesn\'t support Speech Recognition.',
+                editButtonTitle: 'Edit Item', saveButtonTitle: 'Save Changes', cancelButtonTitle: 'Cancel Edit', removeButtonTitle: 'Remove Item',
+                incrementQtyTitle: 'Increase Quantity', decrementQtyTitle: 'Decrease Quantity', settingsButtonTitle: 'Settings', backButtonTitle: 'Back to List',
+                quickAddButton: 'Quick Add Frequent', quickAddTitle: 'Add frequent items', alertQuickAddEmpty: 'No frequent items found in history yet.',
+                alertQuickAddMade: 'Added {count} frequent items.', alertQuickAddFoundNoneNew: 'No new frequent items to add.',
+            },
+            fr: { // French Translations
+                title: 'Liste Futée', settingsTitle: 'Paramètres', addItemPlaceholder: 'Entrer un article', quantityPlaceholder: 'Qté (optionnel)',
+                recordButton: 'Enregistrer l\'article', addButton: 'Ajouter', activeItemsHeader: 'Actifs', doneItemsHeader: 'Terminés',
+                emptyActiveList: 'Aucun article actif. Ajoutez-en !', emptyDoneList: 'Aucun article terminé pour le moment.', languageLabel: 'Langue :',
+                speechLanguageLabel: 'Voix :', generateTypical: 'Suggérer Articles Habituels', importLabel: 'Importer Liste (.json)',
+                exportButton: 'Exporter Liste (.json)', clearList: 'Vider la Liste Actuelle', clearHistory: 'Effacer l\'Historique',
+                footerText: 'Créé avec', alertRemoveItem: 'Êtes-vous sûr de vouloir supprimer "{itemName}" ?',
+                alertClearList: 'Êtes-vous sûr de vouloir vider la liste actuelle ?',
+                alertClearHistory: 'ATTENTION : Ceci supprimera définitivement tout l\'historique et les suggestions. Êtes-vous sûr ?',
+                alertItemExists: '"{itemName}" est déjà dans la liste active.', alertNoHistory: 'Pas assez d\'historique pour générer des suggestions. Continuez à utiliser l\'app !',
+                alertItemsAdded: '{count} articles fréquents ajoutés à votre liste.', alertItemsExist: 'Votre liste actuelle contient déjà la plupart de vos articles habituels.',
+                alertExportSuccess: 'Données exportées avec succès !', alertExportFailed: 'Échec de l\'exportation des données.',
+                alertImportConfirm: 'Ceci remplacera votre liste et historique actuels. Êtes-vous sûr ?', alertImportSuccess: 'Données importées avec succès !',
+                alertImportFailed: 'Échec de l\'importation : {error}', alertReadFileFailed: 'Échec de la lecture du fichier.',
+                alertListEmpty: 'La liste est déjà vide.', alertHistoryEmpty: 'L\'historique est déjà vide.', alertNoInput: 'Veuillez entrer un nom d\'article.',
+                alertSpeechError: 'Erreur de reconnaissance vocale : {error}', alertSpeechNotSupported: 'Désolé, votre navigateur ne supporte pas la reconnaissance vocale.',
+                editButtonTitle: 'Modifier l\'article', saveButtonTitle: 'Enregistrer', cancelButtonTitle: 'Annuler', removeButtonTitle: 'Supprimer l\'article',
+                incrementQtyTitle: 'Augmenter Quantité', decrementQtyTitle: 'Diminuer Quantité', settingsButtonTitle: 'Paramètres', backButtonTitle: 'Retour à la liste',
+                quickAddButton: 'Ajout Rapide Fréquents', quickAddTitle: 'Ajouter articles fréquents', alertQuickAddEmpty: 'Aucun article fréquent trouvé dans l\'historique pour le moment.',
+                alertQuickAddMade: '{count} articles fréquents ajoutés.', alertQuickAddFoundNoneNew: 'Aucun nouvel article fréquent à ajouter.',
+            },
+            ar: { // Arabic Translations
+                title: 'قائمة ذكية', settingsTitle: 'الإعدادات', addItemPlaceholder: 'أدخل عنصر', quantityPlaceholder: 'الكمية (اختياري)',
+                recordButton: 'تسجيل اسم العنصر', addButton: 'إضافة', activeItemsHeader: 'نشط', doneItemsHeader: 'مكتمل',
+                emptyActiveList: 'لا توجد عناصر نشطة. أضف بعض!', emptyDoneList: 'لا توجد عناصر مكتملة بعد.', languageLabel: 'اللغة:',
+                speechLanguageLabel: 'الكلام:', generateTypical: 'اقترح العناصر المعتادة', importLabel: 'استيراد قائمة (.json)',
+                exportButton: 'تصدير قائمة (.json)', clearList: 'مسح القائمة الحالية', clearHistory: 'مسح سجل الشراء',
+                footerText: 'بنيت مع', alertRemoveItem: 'هل أنت متأكد أنك تريد إزالة "{itemName}"؟',
+                alertClearList: 'هل أنت متأكد أنك تريد مسح جميع العناصر من القائمة الحالية؟',
+                alertClearHistory: 'تحذير: سيؤدي هذا إلى حذف جميع بيانات السجل والاقتراحات بشكل دائم. هل أنت متأكد؟',
+                alertItemExists: '"{itemName}" موجود بالفعل في القائمة النشطة.', alertNoHistory: 'لا يوجد سجل كافٍ لإنشاء اقتراحات. استمر في استخدام التطبيق!',
+                alertItemsAdded: 'تمت إضافة {count} عناصر متكررة إلى قائمتك.', alertItemsExist: 'قائمتك الحالية تحتوي بالفعل على معظم العناصر المعتادة.',
+                alertExportSuccess: 'تم تصدير البيانات بنجاح!', alertExportFailed: 'فشل تصدير البيانات.',
+                alertImportConfirm: 'سيؤدي هذا إلى استبدال قائمتك الحالية وسجلك. هل أنت متأكد؟', alertImportSuccess: 'تم استيراد البيانات بنجاح!',
+                alertImportFailed: 'فشل استيراد البيانات: {error}', alertReadFileFailed: 'فشل قراءة الملف.',
+                alertListEmpty: 'القائمة فارغة بالفعل.', alertHistoryEmpty: 'السجل فارغ بالفعل.', alertNoInput: 'الرجاء إدخال اسم العنصر.',
+                alertSpeechError: 'خطأ في التعرف على الكلام: {error}', alertSpeechNotSupported: 'عذرًا، متصفحك لا يدعم التعرف على الكلام.',
+                editButtonTitle: 'تعديل العنصر', saveButtonTitle: 'حفظ التغييرات', cancelButtonTitle: 'إلغاء التعديل', removeButtonTitle: 'إزالة العنصر',
+                incrementQtyTitle: 'زيادة الكمية', decrementQtyTitle: 'تقليل الكمية', settingsButtonTitle: 'الإعدادات', backButtonTitle: 'العودة إلى القائمة',
+                quickAddButton: 'إضافة سريعة للمتكرر', quickAddTitle: 'إضافة العناصر المتكررة', alertQuickAddEmpty: 'لم يتم العثور على عناصر متكررة في السجل بعد.',
+                alertQuickAddMade: 'تمت إضافة {count} عناصر متكررة.', alertQuickAddFoundNoneNew: 'لا توجد عناصر متكررة جديدة لإضافتها.',
+            }
+        };
+
+        // --- DOM Elements ---
+        const smartListApp = document.getElementById('smart-list-app');
+        const mainView = document.getElementById('main-view');
+        const settingsPage = document.getElementById('settings-page');
+        const goToSettingsButton = document.getElementById('go-to-settings');
+        const backToMainButton = document.getElementById('back-to-main');
+        const addItemFormContainer = document.getElementById('add-item-form-container');
+        const addItemForm = document.getElementById('add-item-form');
+        const itemInput = document.getElementById('add-item-input');
+        const quantityInput = document.getElementById('item-quantity');
+        const suggestionsList = document.getElementById('suggestions-list');
+        const audioButton = document.getElementById('audio-input-button');
+        const audioLangSelect = document.getElementById('audio_input_language');
+        const quickAddButton = document.getElementById('quick-add-button');
+        const activeList = document.getElementById('active-list');
+        const doneList = document.getElementById('done-list');
+        const emptyActiveListMessage = document.getElementById('empty-active-list-message');
+        const emptyDoneListMessage = document.getElementById('empty-done-list-message');
+        const uiLangSelect = document.getElementById('ui_language');
+        const generateTypicalButton = document.getElementById('generate-typical-list');
+        const importInput = document.getElementById('import-items');
+        const importLabel = document.querySelector('label[for="import-items"]');
+        const exportButton = document.getElementById('export-items');
+        const clearListButton = document.getElementById('clear-list');
+        const clearHistoryButton = document.getElementById('clear-history');
+
+        // --- State ---
+        let currentItems = [];
+        let itemPurchaseHistory = {};
+        let isSpeechRecognitionActive = false;
+        let draggedItem = null;
+        let currentLanguage = 'en';
+
+        // --- Speech Recognition ---
+        const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+        let recognition;
+        if (SpeechRecognition) {
+            recognition = new SpeechRecognition();
+            recognition.continuous = false;
+            recognition.interimResults = false;
+            recognition.maxAlternatives = 1;
+            recognition.onstart = () => {
+                isSpeechRecognitionActive = true;
+                audioButton.classList.add('recording');
+                audioButton.title = 'Stop Recording';
+            };
+            recognition.onresult = (event) => {
+                const transcript = event.results[0][0].transcript;
+                itemInput.value = transcript.charAt(0).toUpperCase() + transcript.slice(1);
+                itemInput.focus();
+            };
+            recognition.onerror = (event) => {
+                console.error('Speech recognition error:', event.error);
+                alert(getTranslation('alertSpeechError', { error: event.error }));
+                isSpeechRecognitionActive = false;
+                audioButton.classList.remove('recording');
+                audioButton.title = getTranslation('recordButton');
+            };
+            recognition.onend = () => {
+                isSpeechRecognitionActive = false;
+                audioButton.classList.remove('recording');
+                audioButton.title = getTranslation('recordButton');
+            };
+            audioButton.addEventListener('click', () => {
+                if (!SpeechRecognition) {
+                    alert(getTranslation('alertSpeechNotSupported')); return;
+                }
+                if (isSpeechRecognitionActive) {
+                    recognition.stop();
+                } else {
+                    try {
+                        recognition.lang = audioLangSelect ? audioLangSelect.value : 'en-US';
+                        recognition.start();
+                    } catch (e) {
+                        console.error('Could not start recognition:', e);
+                        isSpeechRecognitionActive = false;
+                        audioButton.classList.remove('recording');
+                        audioButton.title = getTranslation('recordButton');
+                    }
+                }
+            });
+        } else {
+            audioButton.disabled = true;
+            audioButton.title = getTranslation('alertSpeechNotSupported');
+            console.warn('Speech Recognition API not supported.');
+        }
+
+        // --- Localization & Direction ---
+        const getTranslation = (key, replacements = {}) => {
+            let text = translations[currentLanguage]?.[key] || translations.en[key] || `Missing key: ${key}`;
+            for (const placeholder in replacements) {
+                text = text.replace(`{${placeholder}}`, replacements[placeholder]);
+            }
+            return text;
+        };
+
+        const setDirection = (lang) => {
+            const isRTL = lang === 'ar';
+            document.documentElement.lang = lang;
+            document.documentElement.dir = isRTL ? 'rtl' : 'ltr';
+            if (isRTL) {
+                suggestionsList.style.left = 'auto';
+                suggestionsList.style.right = '10px';
+            } else {
+                suggestionsList.style.left = '10px';
+                suggestionsList.style.right = 'auto';
+            }
+        };
+
         const setLanguage = (lang) => {
             currentLanguage = lang;
             localStorage.setItem('smartListLanguage', lang);
             if (uiLangSelect) uiLangSelect.value = lang;
-            
+            setDirection(lang);
+
             document.querySelectorAll('[data-translate-key]').forEach(element => {
                 const key = element.dataset.translateKey;
                 const translation = getTranslation(key);
-                const isValidTextTranslation = translation && !translation.startsWith('Missing key:');
+                const span = element.querySelector('span:not(.drag-handle i)');
 
-                // --- Part 1: Set Text Content ---
                 if (element.tagName === 'INPUT' || element.tagName === 'TEXTAREA') {
-                    if (element.placeholder) {
-                        // For placeholders, it's okay to show "Missing key" if the key is truly for a placeholder
-                        // but the translation is missing.
-                        element.placeholder = translation;
-                    }
-                } else if (element.querySelector('span:not(.drag-handle i)')) {
-                    // Element has a specific child span for its text (e.g., buttons with text, H1 title)
-                    const textSpan = element.querySelector('span:not(.drag-handle i)');
-                    if (isValidTextTranslation) {
-                        textSpan.textContent = translation;
-                    }
-                    // If !isValidTextTranslation, we don't modify the span's content,
-                    // especially if the data-translate-key was on a parent and meant for something else.
-                    // If the span itself has the data-translate-key, then 'translation' applies directly to it.
-                } else if (['P', 'OPTION'].includes(element.tagName) && !element.querySelector('i')) {
-                    // Simple text elements like <p> or <option> that don't have icons or complex structure
-                    if (isValidTextTranslation) {
-                        element.textContent = translation;
-                    }
-                } else if (['H1', 'H2', 'BUTTON', 'LABEL'].includes(element.tagName)) {
-                    // For elements that might have an icon AND text, or just an icon, or just text.
-                    const icon = element.querySelector('i');
+                    if (element.placeholder) element.placeholder = translation;
+                } else if (span) {
+                    span.textContent = translation;
+                } else if (element.childNodes.length === 1 && element.childNodes[0].nodeType === Node.TEXT_NODE) {
+                    element.textContent = translation;
+                } else if (element.tagName === 'BUTTON' || element.tagName === 'H1' || element.tagName === 'H2' || element.tagName === 'P' || element.tagName === 'LABEL' || element.tagName === 'OPTION') {
+                    let icon = element.querySelector('i');
                     let textNode = Array.from(element.childNodes).find(node => node.nodeType === Node.TEXT_NODE && node.textContent.trim().length > 0);
-
-                    if (textNode) { // If a text node already exists
-                        if (isValidTextTranslation) {
-                            textNode.textContent = ` ${translation} `; // Add spaces for padding around text
-                        } else {
-                            // If translation is invalid, and a text node exists,
-                            // we might want to clear it if it's not supposed to be there (e.g. leftover from bad key)
-                            // For now, let's leave existing text if new translation is invalid.
-                        }
-                    } else if (icon) { // Has an icon, but no pre-existing text node
-                        if (isValidTextTranslation) { // --- THIS IS THE CRITICAL FIX ---
-                                                      // Only add new text if the translation is valid and not "Missing key..."
-                            const newTextNode = document.createTextNode(` ${translation} `);
-                            element.appendChild(newTextNode); // Generally, text comes after the icon in buttons
-                        }
-                        // If !isValidTextTranslation (e.g. for "settingsButton" key), DO NOTHING.
-                        // This leaves icon-only buttons as icon-only.
-                    } else { // No icon, no pre-existing text node (e.g., a simple text button like "Clear List")
-                        if (isValidTextTranslation) {
-                            element.textContent = translation;
-                        }
-                    }
-                }
-                // Note: The above logic prioritizes child spans with `data-translate-key`.
-                // If an element (e.g. H1) has `data-translate-key` AND a child span also has `data-translate-key`,
-                // both will be processed in separate iterations of the forEach loop.
-
-                // --- Part 2: Set Title Attribute ---
-                let titleKeyToUse = null; 
-
-                if (element.id === 'go-to-settings')       titleKeyToUse = 'settingsButtonTitle';
-                else if (element.id === 'back-to-main')    titleKeyToUse = 'backButtonTitle';
-                else if (element.id === 'quick-add-button') titleKeyToUse = 'quickAddTitle';
-                else if (element.id === 'audio-input-button') {
-                    titleKeyToUse = SpeechRecognition ? 'recordButton' : 'alertSpeechNotSupported';
-                }
-                // General case for other elements that might have a title based on their data-translate-key + "Title"
-                else if (element.hasAttribute('title') && translations[currentLanguage]?.[key + 'Title']) {
-                    titleKeyToUse = key + 'Title';
-                }
-                // Fallback: if element has a title attribute and its main translation key is valid for text, use it as title.
-                // (e.g., a button where its visible text is also its title)
-                else if (element.hasAttribute('title') && isValidTextTranslation) {
-                     // Check if the key itself is a valid title key (e.g. recordButton title is same as its text key)
-                    if (translations[currentLanguage]?.[key] && !key.endsWith('Title') && !key.endsWith('Placeholder') && !key.endsWith('Label')) {
-                        // This ensures we don't use keys like "addItemPlaceholder" as a title if "addItemPlaceholderTitle" isn't found.
-                        // It's for cases where the text key *is* the title key.
-                        titleKeyToUse = key;
-                    }
+                    if (textNode) { textNode.textContent = ` ${translation} `; }
+                    else if (!icon) { element.textContent = translation; }
+                    if (icon && element.firstChild !== icon && document.documentElement.dir === 'ltr') { element.prepend(icon, ' '); }
+                    else if (icon && element.lastChild !== icon && document.documentElement.dir === 'rtl') { element.append(' ', icon); }
                 }
 
+                if (element.title !== undefined) {
+                    let titleKey = key + 'Title';
+                    if (key === 'settingsButton') titleKey = 'settingsButtonTitle';
+                    else if (key === 'backButton') titleKey = 'backButtonTitle';
+                    else if (key === 'quickAddButton') titleKey = 'quickAddTitle';
 
-                if (titleKeyToUse) {
-                    const titleTranslation = getTranslation(titleKeyToUse);
-                    if (titleTranslation && !titleTranslation.startsWith('Missing key:')) {
-                        element.title = titleTranslation;
-                    }
+                    const titleTranslation = getTranslation(titleKey);
+                    if (!titleTranslation.startsWith('Missing key:')) { element.title = titleTranslation; }
+                    else if (key.match(/Button$/) || key.match(/Label$/) || key.match(/Placeholder$/)) { element.title = translation; }
                 }
             });
-            
-            setDirection(lang); // Apply RTL/LTR specific styles AFTER text and titles are set
-            renderItems(); // Re-render items to apply new language to dynamic elements like item buttons' titles
+
+            if(goToSettingsButton) goToSettingsButton.title = getTranslation('settingsButtonTitle');
+            if(backToMainButton) backToMainButton.title = getTranslation('backButtonTitle');
+            if(quickAddButton) quickAddButton.title = getTranslation('quickAddTitle');
+            if(audioButton && !SpeechRecognition) audioButton.title = getTranslation('alertSpeechNotSupported');
+            else if(audioButton) audioButton.title = getTranslation('recordButton');
+
+            renderItems();
         };
+
+        // --- Utility Functions ---
+        const generateId = () => `item-${Date.now()}-${Math.random().toString(16).slice(2)}`;
+        const sanitizeText = (text) => text ? text.trim() : '';
+
+        // --- Local Storage ---
+        const saveState = () => {
+            try {
+                localStorage.setItem('smartListItems', JSON.stringify(currentItems));
+                localStorage.setItem('smartListItemHistory', JSON.stringify(itemPurchaseHistory));
+            } catch (e) { console.error('Error saving state:', e); }
+        };
+        const loadState = () => {
+            try {
+                const storedItems = localStorage.getItem('smartListItems');
+                const storedHistory = localStorage.getItem('smartListItemHistory');
+                currentItems = storedItems ? JSON.parse(storedItems).map(item => ({ ...item, isEditing: item.isEditing || false })) : [];
+                itemPurchaseHistory = storedHistory ? JSON.parse(storedHistory) : {};
+                currentLanguage = localStorage.getItem('smartListLanguage') || 'en';
+            } catch (e) {
+                console.error('Error loading state:', e);
+                currentItems = []; itemPurchaseHistory = {}; currentLanguage = 'en';
+            }
+        };
+
+        // --- History Management ---
+        const updateHistory = (itemText, isPurchase) => {
+            const text = sanitizeText(itemText).toLowerCase();
+            if (!text) return;
+            if (!itemPurchaseHistory[text]) {
+                itemPurchaseHistory[text] = { count: 0, lastPurchased: null, addedDate: new Date().toISOString() };
+            }
+            if (isPurchase) {
+                itemPurchaseHistory[text].count = (itemPurchaseHistory[text].count || 0) + 1;
+                itemPurchaseHistory[text].lastPurchased = new Date().toISOString();
+            } else if(!itemPurchaseHistory[text].addedDate) {
+                itemPurchaseHistory[text].addedDate = new Date().toISOString();
+            }
+        };
+
+        // --- Rendering ---
+        const renderItems = () => {
+            activeList.innerHTML = '';
+            doneList.innerHTML = '';
+
+            const justUncheckedItems = currentItems.filter(item => item.justUnchecked);
+            const otherItems = currentItems.filter(item => !item.justUnchecked);
+            const sortedOtherItems = [...otherItems].sort((a, b) => parseInt(a.id.split('-')[1] || 0) - parseInt(b.id.split('-')[1] || 0));
+            const itemsToRender = [...sortedOtherItems, ...justUncheckedItems];
+
+            const activeItems = itemsToRender.filter(item => !item.done);
+            const doneItems = itemsToRender.filter(item => item.done);
+
+            activeItems.forEach(item => {
+                const el = createItemElement(item);
+                el.classList.add('item-enter');
+                activeList.appendChild(el);
+                requestAnimationFrame(() => { requestAnimationFrame(() => { el.classList.remove('item-enter'); }); });
+            });
+
+            doneItems.forEach(item => {
+                const el = createItemElement(item);
+                el.classList.add('item-enter');
+                doneList.appendChild(el);
+                requestAnimationFrame(() => { requestAnimationFrame(() => { el.classList.remove('item-enter'); }); });
+            });
+
+            currentItems.forEach(item => delete item.justUnchecked); // Clean up flag
+
+            checkEmptyMessages();
+            updateDragAndDropListeners();
+            saveState();
+        };
+
+        const createItemElement = (item) => {
+            const li = document.createElement('li');
+            li.dataset.id = item.id; li.draggable = true;
+
+            const handle = document.createElement('span');
+            handle.classList.add('drag-handle'); handle.innerHTML = '<i class="fas fa-grip-lines-vertical"></i>'; handle.title = 'Drag to reorder';
+            li.appendChild(handle);
+
+            const checkbox = document.createElement('input');
+            checkbox.type = 'checkbox'; checkbox.checked = item.done; checkbox.classList.add('item-checkbox');
+            checkbox.addEventListener('change', () => toggleDone(item.id));
+            li.appendChild(checkbox);
+
+            const detailsDiv = document.createElement('div');
+            detailsDiv.classList.add('item-details');
+            li.appendChild(detailsDiv);
+
+            if (item.isEditing) {
+                const textInput = document.createElement('input'); textInput.type = 'text'; textInput.value = item.text; textInput.classList.add('edit-item-text'); detailsDiv.appendChild(textInput);
+                const quantInput = document.createElement('input'); quantInput.type = 'text'; quantInput.value = item.quantity || ''; quantInput.placeholder = getTranslation('quantityPlaceholder'); quantInput.classList.add('edit-item-quantity'); detailsDiv.appendChild(quantInput);
+                setTimeout(() => textInput.focus(), 50);
+            } else {
+                const textSpan = document.createElement('span'); textSpan.textContent = item.text; textSpan.classList.add('item-text'); detailsDiv.appendChild(textSpan);
+                const quantWrapper = document.createElement('div'); quantWrapper.classList.add('item-quantity-display-wrapper');
+                const quantSpan = document.createElement('span'); quantSpan.textContent = item.quantity || ''; quantSpan.classList.add('item-quantity-display'); quantWrapper.appendChild(quantSpan);
+                if (!item.done && (item.quantity || item.quantity === '' || !isNaN(parseInt(item.quantity)))) {
+                    const stepperDiv = document.createElement('div'); stepperDiv.classList.add('quantity-stepper');
+                    const decreaseBtn = document.createElement('button'); decreaseBtn.innerHTML = '<i class="fas fa-minus"></i>'; decreaseBtn.title = getTranslation('decrementQtyTitle'); decreaseBtn.addEventListener('click', (e) => { e.stopPropagation(); adjustQuantity(item.id, -1); }); stepperDiv.appendChild(decreaseBtn);
+                    const increaseBtn = document.createElement('button'); increaseBtn.innerHTML = '<i class="fas fa-plus"></i>'; increaseBtn.title = getTranslation('incrementQtyTitle'); increaseBtn.addEventListener('click', (e) => { e.stopPropagation(); adjustQuantity(item.id, 1); }); stepperDiv.appendChild(increaseBtn);
+                    quantWrapper.appendChild(stepperDiv);
+                }
+                if (item.quantity || quantWrapper.querySelector('.quantity-stepper')) { detailsDiv.appendChild(quantWrapper); }
+            }
+
+            const actionsDiv = document.createElement('div');
+            actionsDiv.classList.add('item-actions');
+            li.appendChild(actionsDiv);
+
+            if (item.isEditing) {
+                const saveButton = document.createElement('button'); saveButton.innerHTML = '<i class="fas fa-save"></i>'; saveButton.title = getTranslation('saveButtonTitle'); saveButton.classList.add('save-button'); saveButton.addEventListener('click', (e) => { e.stopPropagation(); const newText = li.querySelector('.edit-item-text').value; const newQuantity = li.querySelector('.edit-item-quantity').value; saveEdit(item.id, newText, newQuantity); }); actionsDiv.appendChild(saveButton);
+                const cancelButton = document.createElement('button'); cancelButton.innerHTML = '<i class="fas fa-times"></i>'; cancelButton.title = getTranslation('cancelButtonTitle'); cancelButton.classList.add('cancel-button'); cancelButton.addEventListener('click', (e) => { e.stopPropagation(); cancelEdit(item.id); }); actionsDiv.appendChild(cancelButton);
+                li.querySelectorAll('input[type="text"]').forEach(input => { input.addEventListener('keydown', (e) => { if (e.key === 'Enter') saveButton.click(); else if (e.key === 'Escape') cancelButton.click(); }); });
+            } else {
+                const editButton = document.createElement('button'); editButton.innerHTML = '<i class="fas fa-pencil-alt"></i>'; editButton.title = getTranslation('editButtonTitle'); editButton.classList.add('edit-button'); editButton.addEventListener('click', (e) => { e.stopPropagation(); startEdit(item.id); }); actionsDiv.appendChild(editButton);
+                const removeButton = document.createElement('button'); removeButton.innerHTML = '<i class="fas fa-trash-alt"></i>'; removeButton.title = getTranslation('removeButtonTitle'); removeButton.classList.add('remove-button'); removeButton.addEventListener('click', (e) => { e.stopPropagation(); removeItemWithAnimation(item.id, li); }); actionsDiv.appendChild(removeButton);
+            }
+            return li;
+        };
+
+        // --- Item CRUD ---
+        const addItem = (text, quantity) => {
+            const cleanText = sanitizeText(text);
+            if (!cleanText) { alert(getTranslation('alertNoInput')); return; }
+            const exists = currentItems.some(item => !item.done && sanitizeText(item.text).toLowerCase() === cleanText.toLowerCase());
+            if (exists) { alert(getTranslation('alertItemExists', { itemName: cleanText })); return; }
+            const newItem = { id: generateId(), text: cleanText, quantity: sanitizeText(quantity), done: false, isEditing: false };
+            currentItems.unshift(newItem);
+            updateHistory(cleanText, false);
+            renderItems();
+        };
+        const removeItemWithAnimation = (id, element) => {
+            const item = currentItems.find(item => item.id === id);
+            if (!item || !confirm(getTranslation('alertRemoveItem', { itemName: item.text }))) return;
+            element.classList.add('item-exit');
+            element.addEventListener('transitionend', () => {
+                const itemIndex = currentItems.findIndex(item => item.id === id);
+                if (itemIndex > -1) { currentItems.splice(itemIndex, 1); saveState(); checkEmptyMessages(); }
+            }, { once: true });
+        };
+        const checkEmptyMessages = () => {
+            const hasActive = currentItems.some(item => !item.done);
+            const hasDone = currentItems.some(item => item.done);
+            emptyActiveListMessage.classList.toggle('visible', !hasActive);
+            emptyDoneListMessage.classList.toggle('visible', !hasDone);
+            activeList.previousElementSibling.style.display = hasActive ? 'block' : 'none';
+            doneList.previousElementSibling.style.display = hasDone ? 'block' : 'none';
+        };
+        const toggleDone = (id) => {
+            const itemIndex = currentItems.findIndex(item => item.id === id);
+            if (itemIndex > -1) {
+                const item = currentItems[itemIndex];
+                const wasDone = item.done;
+                item.done = !item.done;
+                if (item.done && !wasDone) { updateHistory(item.text, true); }
+                else if (!item.done && wasDone) { item.justUnchecked = true; }
+                if (item.isEditing) item.isEditing = false;
+                renderItems();
+            }
+        };
+        const startEdit = (id) => { currentItems.forEach(item => item.isEditing = (item.id === id)); renderItems(); };
+        const saveEdit = (id, newText, newQuantity) => {
+            const cleanText = sanitizeText(newText);
+            if (!cleanText) { alert(getTranslation('alertNoInput')); return; }
+            const itemIndex = currentItems.findIndex(item => item.id === id);
+            if (itemIndex > -1) {
+                currentItems[itemIndex] = { ...currentItems[itemIndex], text: cleanText, quantity: sanitizeText(newQuantity), isEditing: false };
+            }
+            renderItems();
+        };
+        const cancelEdit = (id) => { const itemIndex = currentItems.findIndex(item => item.id === id); if (itemIndex > -1) currentItems[itemIndex].isEditing = false; renderItems(); };
+        const adjustQuantity = (id, change) => {
+            const itemIndex = currentItems.findIndex(item => item.id === id);
+            if (itemIndex > -1) {
+                const item = currentItems[itemIndex];
+                let currentQuantity = parseInt(item.quantity || '0');
+                if (isNaN(currentQuantity)) currentQuantity = 0;
+                let newQuantity = Math.max(0, currentQuantity + change);
+                item.quantity = newQuantity.toString();
+                renderItems();
+            }
+        };
+
+        // --- Feature Functions ---
+        const showSuggestions = (query) => {
+            suggestionsList.innerHTML = '';
+            if (!query) { suggestionsList.classList.add('hidden'); return; }
+            const lowerQuery = query.toLowerCase();
+            const historyEntries = Object.entries(itemPurchaseHistory);
+            const sortedHistory = historyEntries.sort(([, histA], [, histB]) => (histB.count || 0) - (histA.count || 0));
+            const matchingSuggestions = sortedHistory.filter(([text]) => text.includes(lowerQuery)).slice(0, 5);
+            if (matchingSuggestions.length > 0) {
+                matchingSuggestions.forEach(([text]) => {
+                    const li = document.createElement('li');
+                    li.textContent = text.charAt(0).toUpperCase() + text.slice(1);
+                    li.addEventListener('click', () => { itemInput.value = li.textContent; suggestionsList.classList.add('hidden'); suggestionsList.innerHTML = ''; quantityInput.focus(); });
+                    suggestionsList.appendChild(li);
+                });
+                suggestionsList.classList.remove('hidden');
+            } else { suggestionsList.classList.add('hidden'); }
+        };
+        const generateTypicalList = () => {
+            const threshold = 2; const maxItems = 15;
+            const typicalItems = Object.entries(itemPurchaseHistory).filter(([, hist]) => (hist.count || 0) >= threshold).sort(([, histA], [, histB]) => (histB.count || 0) - (histA.count || 0)).slice(0, maxItems).map(([text]) => text);
+            if (typicalItems.length === 0) { alert(getTranslation('alertNoHistory')); return; }
+            let addedCount = 0;
+            typicalItems.forEach(text => {
+                const alreadyActive = currentItems.some(item => !item.done && sanitizeText(item.text).toLowerCase() === text);
+                if (!alreadyActive) { const originalCaseText = Object.keys(itemPurchaseHistory).find(k => k.toLowerCase() === text) || text; addItem(originalCaseText.charAt(0).toUpperCase() + originalCaseText.slice(1), ''); addedCount++; }
+            });
+            if (addedCount === 0) alert(getTranslation('alertItemsExist'));
+        };
+        const addFrequentItems = () => {
+            const maxToAdd = 5;
+            const frequentItems = Object.entries(itemPurchaseHistory).filter(([, hist]) => (hist.count || 0) > 0).sort(([, histA], [, histB]) => (histB.count || 0) - (histA.count || 0)).map(([text]) => text);
+            if (frequentItems.length === 0) { alert(getTranslation('alertQuickAddEmpty')); return; }
+            let addedCount = 0;
+            for (const text of frequentItems) {
+                if (addedCount >= maxToAdd) break;
+                const alreadyActive = currentItems.some(item => !item.done && sanitizeText(item.text).toLowerCase() === text);
+                if (!alreadyActive) { const originalCaseText = Object.keys(itemPurchaseHistory).find(k => k.toLowerCase() === text) || text; addItem(originalCaseText.charAt(0).toUpperCase() + originalCaseText.slice(1), ''); addedCount++; }
+            }
+            if (addedCount > 0) {
+                 console.log(getTranslation('alertQuickAddMade', { count: addedCount }));
+                 quickAddButton.style.backgroundColor = '#a6d7ff';
+                 setTimeout(() => { quickAddButton.style.backgroundColor = ''; }, 500);
+            } else { alert(getTranslation('alertQuickAddFoundNoneNew')); }
+        };
+        const exportData = () => {
+            try {
+                const dataToExport = { currentList: currentItems.map(({ isEditing, justUnchecked, ...item }) => item), purchaseHistory: itemPurchaseHistory };
+                const dataStr = JSON.stringify(dataToExport, null, 2);
+                const dataBlob = new Blob([dataStr], { type: 'application/json' });
+                const url = URL.createObjectURL(dataBlob);
+                const link = document.createElement('a');
+                link.download = `smart_list_backup_${new Date().toISOString().slice(0,10)}.json`;
+                link.href = url; link.click(); URL.revokeObjectURL(url);
+            } catch (e) { console.error('Export failed:', e); alert(getTranslation('alertExportFailed')); }
+        };
+        const importData = (event) => {
+            const file = event.target.files[0]; if (!file) return;
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                try {
+                    const importedData = JSON.parse(e.target.result);
+                    if (importedData && typeof importedData === 'object') {
+                        const hasList = Array.isArray(importedData.currentList);
+                        const hasHistory = typeof importedData.purchaseHistory === 'object';
+                        if (!confirm(getTranslation('alertImportConfirm'))) { importInput.value = ''; return; }
+                        currentItems = hasList ? importedData.currentList.map(item => ({...item, isEditing: false })) : [];
+                        itemPurchaseHistory = hasHistory ? importedData.purchaseHistory : {};
+                        renderItems(); alert(getTranslation('alertImportSuccess')); showMainView();
+                    } else { throw new Error('Invalid file format.'); }
+                } catch (error) { console.error('Import failed:', error); alert(getTranslation('alertImportFailed', { error: error.message })); }
+                finally { importInput.value = ''; }
+            };
+            reader.onerror = () => { alert(getTranslation('alertReadFileFailed')); importInput.value = ''; };
+            reader.readAsText(file);
+        };
+        const clearCurrentList = () => {
+            if (currentItems.length > 0 && confirm(getTranslation('alertClearList'))) {
+                const allItemElements = [...activeList.children, ...doneList.children];
+                if (allItemElements.length > 0) {
+                    allItemElements.forEach(el => el.classList.add('item-exit'));
+                    allItemElements[allItemElements.length - 1].addEventListener('transitionend', () => { currentItems = []; renderItems(); }, { once: true });
+                } else { currentItems = []; renderItems(); }
+            } else if (currentItems.length === 0) { alert(getTranslation('alertListEmpty')); }
+        };
+        const clearHistory = () => {
+            if (Object.keys(itemPurchaseHistory).length > 0 && confirm(getTranslation('alertClearHistory'))) {
+                itemPurchaseHistory = {}; renderItems();
+            } else if (Object.keys(itemPurchaseHistory).length === 0) { alert(getTranslation('alertHistoryEmpty')); }
+        };
+
+        // --- Drag and Drop ---
+        let dragOverElement = null;
+        function handleDragStart(e) { if (!e.target.closest('.drag-handle')) { e.preventDefault(); return; } draggedItem = e.currentTarget; e.dataTransfer.effectAllowed = 'move'; e.dataTransfer.setData('text/plain', draggedItem.dataset.id); setTimeout(() => { if (draggedItem) draggedItem.classList.add('dragging'); }, 0); }
+        function handleDragEnd() { if (draggedItem) draggedItem.classList.remove('dragging'); if (dragOverElement) dragOverElement.classList.remove('drag-over'); draggedItem = null; dragOverElement = null; }
+        function handleDragOver(e) { e.preventDefault(); if (!draggedItem) return; const targetList = e.target.closest('.item-list'); const targetListItem = e.target.closest('li'); if (!targetList || targetList.id !== draggedItem.parentElement.id) { e.dataTransfer.dropEffect = 'none'; if (dragOverElement) dragOverElement.classList.remove('drag-over'); dragOverElement = null; return; } e.dataTransfer.dropEffect = 'move'; if (targetListItem && targetListItem !== draggedItem && targetListItem !== dragOverElement) { if (dragOverElement) dragOverElement.classList.remove('drag-over'); targetListItem.classList.add('drag-over'); dragOverElement = targetListItem; } }
+        function handleDragLeave(e) { if (e.target.classList.contains('item-list') || (dragOverElement && e.target === dragOverElement && !dragOverElement.contains(e.relatedTarget)) ) { if(dragOverElement) dragOverElement.classList.remove('drag-over'); dragOverElement = null; } }
+        function handleDrop(e) {
+            e.preventDefault();
+            if (dragOverElement && draggedItem && dragOverElement !== draggedItem) {
+                const draggedId = e.dataTransfer.getData('text/plain'); const targetId = dragOverElement.dataset.id;
+                const draggedIndex = currentItems.findIndex(item => item.id === draggedId); let targetIndex = currentItems.findIndex(item => item.id === targetId);
+                if (draggedIndex !== -1 && targetIndex !== -1) { const [movedItem] = currentItems.splice(draggedIndex, 1); targetIndex = currentItems.findIndex(item => item.id === targetId); currentItems.splice(targetIndex, 0, movedItem); renderItems(); }
+            }
+            if (dragOverElement) dragOverElement.classList.remove('drag-over'); if (draggedItem) draggedItem.classList.remove('dragging'); draggedItem = null; dragOverElement = null;
+        }
+        function updateDragAndDropListeners() {
+            const items = document.querySelectorAll('.item-list li');
+            items.forEach(item => {
+                item.removeEventListener('dragstart', handleDragStart); item.removeEventListener('dragend', handleDragEnd); item.removeEventListener('dragover', handleDragOver); item.removeEventListener('dragleave', handleDragLeave); item.removeEventListener('drop', handleDrop);
+                item.ontouchstart = null; item.ontouchmove = null; item.ontouchend = null;
+                item.addEventListener('dragstart', handleDragStart); item.addEventListener('dragend', handleDragEnd); item.addEventListener('dragover', handleDragOver); item.addEventListener('dragleave', handleDragLeave); item.addEventListener('drop', handleDrop);
+                const handle = item.querySelector('.drag-handle'); if (handle) { addTouchListenersToHandle(handle, item); }
+            });
+        }
+        function addTouchListenersToHandle(handle, item) {
+            let touchStartY = 0, currentTouchY = 0, touchDraggedItem = null, touchDragOverElement = null;
+            handle.ontouchstart = (e) => { touchDraggedItem = item; touchStartY = e.touches[0].clientY; touchDraggedItem.style.opacity = '0.6'; touchDraggedItem.style.zIndex = '1000'; touchDraggedItem.style.transition = 'none'; document.addEventListener('touchmove', handleTouchMove, { passive: false }); document.addEventListener('touchend', handleTouchEnd, { once: true }); };
+            const handleTouchMove = (e) => { if (!touchDraggedItem) return; e.preventDefault(); currentTouchY = e.touches[0].clientY; const diffY = currentTouchY - touchStartY; touchDraggedItem.style.transform = `translateY(${diffY}px) scale(1.02)`; const elementUnderTouch = document.elementFromPoint(e.touches[0].clientX, e.touches[0].clientY); const potentialTarget = elementUnderTouch ? elementUnderTouch.closest('li') : null; if (potentialTarget && potentialTarget !== touchDraggedItem && potentialTarget.parentElement.id === touchDraggedItem.parentElement.id) { if (touchDragOverElement && touchDragOverElement !== potentialTarget) { touchDragOverElement.classList.remove('drag-over'); } if (potentialTarget !== touchDragOverElement) { potentialTarget.classList.add('drag-over'); touchDragOverElement = potentialTarget; } } else { if (touchDragOverElement) { touchDragOverElement.classList.remove('drag-over'); touchDragOverElement = null; } } const viewportHeight = window.innerHeight; const scrollThreshold = 60; const scrollSpeed = 10; if (currentTouchY < scrollThreshold) { window.scrollBy(0, -scrollSpeed); } else if (currentTouchY > viewportHeight - scrollThreshold) { window.scrollBy(0, scrollSpeed); } };
+            const handleTouchEnd = () => { document.removeEventListener('touchmove', handleTouchMove); if (!touchDraggedItem) return; touchDraggedItem.style.opacity = '1'; touchDraggedItem.style.transform = 'translateY(0) scale(1)'; touchDraggedItem.style.zIndex = 'auto'; touchDraggedItem.style.transition = ''; if (touchDragOverElement) { touchDragOverElement.classList.remove('drag-over'); const draggedId = touchDraggedItem.dataset.id; const targetId = touchDragOverElement.dataset.id; const draggedIndex = currentItems.findIndex(item => item.id === draggedId); let targetIndex = currentItems.findIndex(item => item.id === targetId); if (draggedIndex !== -1 && targetIndex !== -1) { const [movedItem] = currentItems.splice(draggedIndex, 1); targetIndex = currentItems.findIndex(item => item.id === targetId); currentItems.splice(targetIndex, 0, movedItem); renderItems(); } } touchDraggedItem = null; touchDragOverElement = null; };
+        }
+
+        // --- Page Navigation ---
+        const showSettingsPage = () => { settingsPage.classList.add('visible'); mainView.classList.add('hidden'); window.scrollTo(0, 0); };
+        const showMainView = () => { settingsPage.classList.remove('visible'); mainView.classList.remove('hidden'); };
+
+        // --- Event Listeners ---
+        addItemForm.addEventListener('submit', (e) => { e.preventDefault(); addItem(itemInput.value, quantityInput.value); itemInput.value = ''; quantityInput.value = ''; itemInput.focus(); suggestionsList.classList.add('hidden'); });
+        itemInput.addEventListener('input', () => showSuggestions(itemInput.value));
+        itemInput.addEventListener('focus', () => showSuggestions(itemInput.value));
+        document.addEventListener('click', (e) => { if (!itemInput.contains(e.target) && !suggestionsList.contains(e.target) && !addItemFormContainer.contains(e.target)) { suggestionsList.classList.add('hidden'); } });
+        quickAddButton.addEventListener('click', addFrequentItems);
+        goToSettingsButton.addEventListener('click', showSettingsPage);
+        backToMainButton.addEventListener('click', showMainView);
+        if (uiLangSelect) uiLangSelect.addEventListener('change', (e) => setLanguage(e.target.value));
+        if (generateTypicalButton) generateTypicalButton.addEventListener('click', generateTypicalList);
+        if (exportButton) exportButton.addEventListener('click', exportData);
+        if (importInput) importInput.addEventListener('change', importData);
+        if (clearListButton) clearListButton.addEventListener('click', clearCurrentList);
+        if (clearHistoryButton) clearHistoryButton.addEventListener('click', clearHistory);
+
+        // --- Initialization ---
+        loadState();
+        setLanguage(currentLanguage); // Applies language, direction, and initial render
+
+    </script>
+</body>
+</html>
