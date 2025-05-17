@@ -506,47 +506,99 @@
             currentLanguage = lang;
             localStorage.setItem('smartListLanguage', lang);
             if (uiLangSelect) uiLangSelect.value = lang;
-            setDirection(lang);
-
+            
             document.querySelectorAll('[data-translate-key]').forEach(element => {
                 const key = element.dataset.translateKey;
                 const translation = getTranslation(key);
-                const span = element.querySelector('span:not(.drag-handle i)');
+                const isValidTextTranslation = translation && !translation.startsWith('Missing key:');
 
+                // --- Part 1: Set Text Content ---
                 if (element.tagName === 'INPUT' || element.tagName === 'TEXTAREA') {
-                    if (element.placeholder) element.placeholder = translation;
-                } else if (span) {
-                    span.textContent = translation;
-                } else if (element.childNodes.length === 1 && element.childNodes[0].nodeType === Node.TEXT_NODE) {
-                    element.textContent = translation;
-                } else if (element.tagName === 'BUTTON' || element.tagName === 'H1' || element.tagName === 'H2' || element.tagName === 'P' || element.tagName === 'LABEL' || element.tagName === 'OPTION') {
-                    let icon = element.querySelector('i');
+                    if (element.placeholder) {
+                        // For placeholders, it's okay to show "Missing key" if the key is truly for a placeholder
+                        // but the translation is missing.
+                        element.placeholder = translation;
+                    }
+                } else if (element.querySelector('span:not(.drag-handle i)')) {
+                    // Element has a specific child span for its text (e.g., buttons with text, H1 title)
+                    const textSpan = element.querySelector('span:not(.drag-handle i)');
+                    if (isValidTextTranslation) {
+                        textSpan.textContent = translation;
+                    }
+                    // If !isValidTextTranslation, we don't modify the span's content,
+                    // especially if the data-translate-key was on a parent and meant for something else.
+                    // If the span itself has the data-translate-key, then 'translation' applies directly to it.
+                } else if (['P', 'OPTION'].includes(element.tagName) && !element.querySelector('i')) {
+                    // Simple text elements like <p> or <option> that don't have icons or complex structure
+                    if (isValidTextTranslation) {
+                        element.textContent = translation;
+                    }
+                } else if (['H1', 'H2', 'BUTTON', 'LABEL'].includes(element.tagName)) {
+                    // For elements that might have an icon AND text, or just an icon, or just text.
+                    const icon = element.querySelector('i');
                     let textNode = Array.from(element.childNodes).find(node => node.nodeType === Node.TEXT_NODE && node.textContent.trim().length > 0);
-                    if (textNode) { textNode.textContent = ` ${translation} `; }
-                    else if (!icon) { element.textContent = translation; }
-                    if (icon && element.firstChild !== icon && document.documentElement.dir === 'ltr') { element.prepend(icon, ' '); }
-                    else if (icon && element.lastChild !== icon && document.documentElement.dir === 'rtl') { element.append(' ', icon); }
+
+                    if (textNode) { // If a text node already exists
+                        if (isValidTextTranslation) {
+                            textNode.textContent = ` ${translation} `; // Add spaces for padding around text
+                        } else {
+                            // If translation is invalid, and a text node exists,
+                            // we might want to clear it if it's not supposed to be there (e.g. leftover from bad key)
+                            // For now, let's leave existing text if new translation is invalid.
+                        }
+                    } else if (icon) { // Has an icon, but no pre-existing text node
+                        if (isValidTextTranslation) { // --- THIS IS THE CRITICAL FIX ---
+                                                      // Only add new text if the translation is valid and not "Missing key..."
+                            const newTextNode = document.createTextNode(` ${translation} `);
+                            element.appendChild(newTextNode); // Generally, text comes after the icon in buttons
+                        }
+                        // If !isValidTextTranslation (e.g. for "settingsButton" key), DO NOTHING.
+                        // This leaves icon-only buttons as icon-only.
+                    } else { // No icon, no pre-existing text node (e.g., a simple text button like "Clear List")
+                        if (isValidTextTranslation) {
+                            element.textContent = translation;
+                        }
+                    }
+                }
+                // Note: The above logic prioritizes child spans with `data-translate-key`.
+                // If an element (e.g. H1) has `data-translate-key` AND a child span also has `data-translate-key`,
+                // both will be processed in separate iterations of the forEach loop.
+
+                // --- Part 2: Set Title Attribute ---
+                let titleKeyToUse = null; 
+
+                if (element.id === 'go-to-settings')       titleKeyToUse = 'settingsButtonTitle';
+                else if (element.id === 'back-to-main')    titleKeyToUse = 'backButtonTitle';
+                else if (element.id === 'quick-add-button') titleKeyToUse = 'quickAddTitle';
+                else if (element.id === 'audio-input-button') {
+                    titleKeyToUse = SpeechRecognition ? 'recordButton' : 'alertSpeechNotSupported';
+                }
+                // General case for other elements that might have a title based on their data-translate-key + "Title"
+                else if (element.hasAttribute('title') && translations[currentLanguage]?.[key + 'Title']) {
+                    titleKeyToUse = key + 'Title';
+                }
+                // Fallback: if element has a title attribute and its main translation key is valid for text, use it as title.
+                // (e.g., a button where its visible text is also its title)
+                else if (element.hasAttribute('title') && isValidTextTranslation) {
+                     // Check if the key itself is a valid title key (e.g. recordButton title is same as its text key)
+                    if (translations[currentLanguage]?.[key] && !key.endsWith('Title') && !key.endsWith('Placeholder') && !key.endsWith('Label')) {
+                        // This ensures we don't use keys like "addItemPlaceholder" as a title if "addItemPlaceholderTitle" isn't found.
+                        // It's for cases where the text key *is* the title key.
+                        titleKeyToUse = key;
+                    }
                 }
 
-                if (element.title !== undefined) {
-                    let titleKey = key + 'Title';
-                    if (key === 'settingsButton') titleKey = 'settingsButtonTitle';
-                    else if (key === 'backButton') titleKey = 'backButtonTitle';
-                    else if (key === 'quickAddButton') titleKey = 'quickAddTitle';
 
-                    const titleTranslation = getTranslation(titleKey);
-                    if (!titleTranslation.startsWith('Missing key:')) { element.title = titleTranslation; }
-                    else if (key.match(/Button$/) || key.match(/Label$/) || key.match(/Placeholder$/)) { element.title = translation; }
+                if (titleKeyToUse) {
+                    const titleTranslation = getTranslation(titleKeyToUse);
+                    if (titleTranslation && !titleTranslation.startsWith('Missing key:')) {
+                        element.title = titleTranslation;
+                    }
                 }
             });
-
-            if(goToSettingsButton) goToSettingsButton.title = getTranslation('settingsButtonTitle');
-            if(backToMainButton) backToMainButton.title = getTranslation('backButtonTitle');
-            if(quickAddButton) quickAddButton.title = getTranslation('quickAddTitle');
-            if(audioButton && !SpeechRecognition) audioButton.title = getTranslation('alertSpeechNotSupported');
-            else if(audioButton) audioButton.title = getTranslation('recordButton');
-
-            renderItems();
+            
+            setDirection(lang); // Apply RTL/LTR specific styles AFTER text and titles are set
+            renderItems(); // Re-render items to apply new language to dynamic elements like item buttons' titles
         };
 
         // --- Utility Functions ---
